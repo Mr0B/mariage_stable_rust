@@ -1,13 +1,7 @@
-pub struct Man(pub i32, pub Vec<i32>, pub i32,);
-
-impl Man{
-    pub(crate) fn new(name: i32, preference: Vec<i32>, proposing_to: i32) -> Man {
-        Man { 0: name, 1: preference, 2: proposing_to }
-    }
-}
+use crate::object::man::Man;
 
 //favorite is public only for testing purposes
-pub struct Woman(pub i32, pub Vec<i32>, pub i32,);
+pub struct Woman(pub i32, pub Vec<i32>, i32,);
 
 impl Woman{
     pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: i32) -> Woman {
