@@ -14,4 +14,8 @@ impl Deck{
     pub(crate) fn put_at_the_end(&mut self, newly_single: Man) {
         self.0.push(newly_single);
     }
+
+    pub(crate) fn empty(&mut self) -> bool {
+        return self.0.is_empty();
+    }
 }
