@@ -43,9 +43,9 @@ fn main() {
             None => {}
             Some(woman) => {
                 println!("Woman");
-                println!("{},{:?},{}", woman.0, woman.1, woman.2.name);
+                println!("{},{:?},{}", woman.name, woman.preference, woman.favorite.name);
                 println!("Man");
-                println!("{},{:?},{}", woman.2.name, woman.2.preference, woman.2.proposing_to);
+                println!("{},{:?},{}", woman.favorite.name, woman.favorite.preference, woman.favorite.proposing_to);
             }
         }
     }
