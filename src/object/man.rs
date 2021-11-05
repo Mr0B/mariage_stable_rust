@@ -1,8 +1,8 @@
 #[derive(Clone)]
 pub struct Man {
     pub name: i32,
-    pub preference: Vec<i32>,
-    pub proposing_to: i32,
+    preference: Vec<i32>,
+    proposing_to: i32,
 }
 
 impl Man{

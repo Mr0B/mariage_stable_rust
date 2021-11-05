@@ -42,10 +42,10 @@ fn main() {
         match temporary {
             None => {}
             Some(woman) => {
-                println!("Woman");
-                println!("{},{:?},{}", woman.name, woman.preference, woman.favorite.name);
                 println!("Man");
-                println!("{},{:?},{}", woman.favorite.name, woman.favorite.preference, woman.favorite.proposing_to);
+                println!("{},{:?},{}", woman.favorite().name, woman.favorite().preference(), woman.favorite().proposing_to());
+                println!("Woman");
+                println!("{},{:?},{}", woman.name, woman.preference, woman.favorite().name);
             }
         }
     }

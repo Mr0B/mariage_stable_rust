@@ -4,7 +4,7 @@ use crate::object::man::Man;
 pub struct Woman {
     pub name: i32,
     pub preference: Vec<i32>,
-    pub favorite: Man,
+    favorite: Man,
 }
 
 impl Woman{
