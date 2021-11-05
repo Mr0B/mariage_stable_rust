@@ -1,4 +1,5 @@
 mod object;
+mod test;
 
 use std::collections::HashMap;
 use rand::prelude::SliceRandom;
@@ -10,8 +11,12 @@ fn main() {
     let mut test_deck: Deck = deck::Deck::new(vec![]);
     init_men(&mut test_deck, 5);
     let mut test_women: HashMap<i32, Woman> = init_woman(5);
-    while !(test_deck.empty()) {
-        let man_proposing=test_deck.give_first();
+    mariage_stable(&mut test_deck, &mut test_women);
+}
+
+fn mariage_stable(deck: &mut Deck, women: &mut HashMap<i32, Woman>) {
+    while !(deck.empty()) {
+        let man_proposing=deck.give_first();
         match man_proposing {
             None => {println!("Something went wrong")}
             Some(man) => {
@@ -21,31 +26,19 @@ fn main() {
                 match target {
                     None => {println!("Something went wrong")}
                     Some(target) => {
-                        let woman_being_proposed_to: Option<&mut Woman> =test_women.get_mut(target);
+                        let woman_being_proposed_to: Option<&mut Woman> =women.get_mut(target);
                         match woman_being_proposed_to {
                             None => {println!("Something went wrong")}
                             Some(woman) => {
                                 let mut dropped_man = woman.check_favorite(man);
                                 *dropped_man.proposing_to_mutable()=*dropped_man.proposing_to()+1;
                                 if dropped_man.name !=-1 {
-                                    test_deck.put_at_the_end(dropped_man);
+                                    deck.put_at_the_end(dropped_man);
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    }
-    for i in 0..test_women.len() {
-        let temporary = test_women.get(&(i as i32));
-        match temporary {
-            None => {}
-            Some(woman) => {
-                println!("Man");
-                println!("{},{:?},{}", woman.favorite().name, woman.favorite().preference(), woman.favorite().proposing_to());
-                println!("Woman");
-                println!("{},{:?},{}", woman.name, woman.preference, woman.favorite().name);
             }
         }
     }

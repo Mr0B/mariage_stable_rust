@@ -1,6 +1,7 @@
 use crate::object::man::Man;
 
 //favorite is public only for testing purposes
+#[derive(Clone)]
 pub struct Woman {
     pub name: i32,
     pub preference: Vec<i32>,
