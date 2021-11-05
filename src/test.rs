@@ -19,7 +19,7 @@ mod tests {
         test_women.insert(2, woman::Woman::new(2,vec![2,1,3,0], man::Man::new(-1, generate_preference(0), -1)));
         test_women.insert(3, woman::Woman::new(3,vec![1,0,2,3], man::Man::new(-1, generate_preference(0), -1)));
         mariage_stable(&mut test_deck, &mut test_women);
-        let clone_women = test_women.clone();
+        let clone_women = test_women;
         let woman_a = clone_women.get(&0);
         match woman_a {
             None => {panic!()}

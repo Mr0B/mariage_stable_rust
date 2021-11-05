@@ -21,8 +21,7 @@ fn mariage_stable(deck: &mut Deck, women: &mut HashMap<i32, Woman>) {
             None => {println!("Something went wrong")}
             Some(man) => {
                 let index:usize= *man.proposing_to() as usize;
-                let target_list:Vec<i32> = man.preference().clone();
-                let target: Option<&i32> = target_list.get(index);
+                let target: Option<&i32> = man.preference().get(index);
                 match target {
                     None => {println!("Something went wrong")}
                     Some(target) => {
