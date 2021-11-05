@@ -27,7 +27,7 @@ fn main() {
                             Some(woman) => {
                                 let mut dropped_man = woman.check_favorite(man);
                                 *dropped_man.proposing_to_mutable()=*dropped_man.proposing_to()+1;
-                                if dropped_man.0!=-1 {
+                                if dropped_man.name !=-1 {
                                     test_deck.put_at_the_end(dropped_man);
                                 }
                             }
@@ -43,9 +43,9 @@ fn main() {
             None => {}
             Some(woman) => {
                 println!("Woman");
-                println!("{},{:?},{}", woman.0, woman.1, woman.2.0);
+                println!("{},{:?},{}", woman.0, woman.1, woman.2.name);
                 println!("Man");
-                println!("{},{:?},{}", woman.2.0, woman.2.1, woman.2.2);
+                println!("{},{:?},{}", woman.2.name, woman.2.preference, woman.2.proposing_to);
             }
         }
     }

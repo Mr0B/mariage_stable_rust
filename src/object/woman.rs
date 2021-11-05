@@ -8,8 +8,8 @@ impl Woman{
         Woman { 0: name, 1: preference, 2: favorite }
     }
     pub(crate) fn check_favorite(&mut self, pretending: Man) -> Man {
-        let position_pretending =self.1.iter().position(|&r| r == pretending.0).unwrap();
-        let position_favorite=self.1.iter().position(|&r| r == self.2.0).unwrap_or(999999999);
+        let position_pretending =self.1.iter().position(|&r| r == pretending.name).unwrap();
+        let position_favorite=self.1.iter().position(|&r| r == self.2.name).unwrap_or(999999999);
         return if position_favorite > position_pretending {
             let former_favorite = self.favorite().clone();
             *self.favorite_mutable() = pretending;
