@@ -1,15 +1,19 @@
 use crate::object::man::Man;
 
-//favorite is public only for testing purposes
-pub struct Woman(pub i32, pub Vec<i32>, pub Man);
+#[derive(Clone)]
+pub struct Woman {
+    pub name: i32,
+    pub preference: Vec<i32>,
+    favorite: Man,
+}
 
 impl Woman{
     pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: Man) -> Woman {
-        Woman { 0: name, 1: preference, 2: favorite }
+        Woman { name, preference, favorite }
     }
     pub(crate) fn check_favorite(&mut self, pretending: Man) -> Man {
-        let position_pretending =self.1.iter().position(|&r| r == pretending.0).unwrap();
-        let position_favorite=self.1.iter().position(|&r| r == self.2.0).unwrap_or(999999999);
+        let position_pretending =self.preference.iter().position(|&r| r == pretending.name).unwrap();
+        let position_favorite=self.preference.iter().position(|&r| r == self.favorite.name).unwrap_or(999999999);
         return if position_favorite > position_pretending {
             let former_favorite = self.favorite().clone();
             *self.favorite_mutable() = pretending;
@@ -20,10 +24,10 @@ impl Woman{
     }
 
     pub(crate) fn favorite(&self) -> &Man {
-        &self.2
+        &self.favorite
     }
 
     pub(crate) fn favorite_mutable(&mut self) -> &mut Man {
-        &mut self.2
+        &mut self.favorite
     }
 }
