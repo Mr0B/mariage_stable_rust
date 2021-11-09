@@ -16,13 +16,15 @@ fn main() {
 
 fn mariage_stable(deck: &mut Deck, women: &mut HashMap<i32, Woman>) {
     while let Some(mut man_proposing) = deck.give_first() {
-        let woman_being_proposed_to: Option<&mut Woman> = women.get_mut(man_proposing.find_next_woman());
-        match woman_being_proposed_to {
-            None => { panic!("Something went wrong!") }
-            Some(woman) => {
-                let dropped_man = woman.check_favorite(man_proposing);
-                if dropped_man.name != -1 {
-                    deck.put_at_the_end(dropped_man);
+        if let Some(target) = man_proposing.find_next_woman() {
+            let woman_being_proposed_to: Option<&mut Woman> = women.get_mut(target);
+            match woman_being_proposed_to {
+                None => { panic!("Something went wrong!") }
+                Some(woman) => {
+                    let dropped_man = woman.check_favorite(man_proposing);
+                    if dropped_man.name != -1 {
+                        deck.put_at_the_end(dropped_man);
+                    }
                 }
             }
         }

@@ -10,12 +10,12 @@ impl Man{
         Man { name, preference, proposing_to }
     }
 
-    pub(crate) fn find_next_woman(&mut self) -> &i32 {
+    pub(crate) fn find_next_woman(&mut self) -> Option<&i32> {
         *self.proposing_to_mutable()=self.proposing_to()+1;
         if let Some(target) = self.preference().get(*self.proposing_to() as usize){
-            return target;
+            return Some(target);
         }
-        panic!("Something went wrong")
+        return None;
     }
 
     fn proposing_to(&self) -> &i32 {
