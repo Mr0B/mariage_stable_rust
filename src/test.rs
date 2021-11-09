@@ -9,10 +9,10 @@ mod tests {
     #[test]
     fn test_mariage_stable(){
         let mut test_deck: Deck = deck::Deck::new(vec![]);
-        test_deck.put_at_the_end(man::Man::new(0, vec![2,1,3,0], 0));
-        test_deck.put_at_the_end(man::Man::new(1, vec![1,0,2,3], 0));
-        test_deck.put_at_the_end(man::Man::new(2, vec![1,3,0,2], 0));
-        test_deck.put_at_the_end(man::Man::new(3, vec![2,0,3,1], 0));
+        test_deck.put_at_the_end(man::Man::new(0, vec![2,1,3,0], -1));
+        test_deck.put_at_the_end(man::Man::new(1, vec![1,0,2,3], -1));
+        test_deck.put_at_the_end(man::Man::new(2, vec![1,3,0,2], -1));
+        test_deck.put_at_the_end(man::Man::new(3, vec![2,0,3,1], -1));
         let mut test_women: HashMap<i32, Woman> = HashMap::new();
         test_women.insert(0, woman::Woman::new(0,vec![0,1,3,2], man::Man::new(-1, generate_preference(0), -1)));
         test_women.insert(1, woman::Woman::new(1,vec![2,0,3,1], man::Man::new(-1, generate_preference(0), -1)));
