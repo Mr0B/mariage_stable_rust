@@ -19,7 +19,7 @@ fn mariage_stable(deck: &mut Deck, women: &mut HashMap<i32, Woman>) {
         if let Some(target) = man_proposing.preference().get(*man_proposing.proposing_to() as usize){
             let woman_being_proposed_to: Option<&mut Woman> =women.get_mut(target);
             match woman_being_proposed_to {
-                None => {println!("Something went wrong")}
+                None => {panic!("Something went wrong!")}
                 Some(woman) => {
                     let mut dropped_man = woman.check_favorite(man_proposing);
                     *dropped_man.proposing_to_mutable()=*dropped_man.proposing_to()+1;
