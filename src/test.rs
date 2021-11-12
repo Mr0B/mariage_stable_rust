@@ -8,7 +8,7 @@ mod tests {
 
     #[test]
     fn test_marriage_stable(){
-        let mut test_deck: Storage = Deck::new(vec![]);
+        let mut test_deck: Storage = Deck::new();
         test_deck.add(man::Man::new(0, vec![2,1,3,0], -1));
         test_deck.add(man::Man::new(1, vec![1,0,2,3], -1));
         test_deck.add(man::Man::new(2, vec![1,3,0,2], -1));

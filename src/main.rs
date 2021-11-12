@@ -8,7 +8,7 @@ use crate::object::deck::*;
 use crate::object::woman::*;
 
 fn main() {
-    let mut test_deck: Storage = Deck::new(vec![]);
+    let mut test_deck: Storage = Deck::new();
     init_men(&mut test_deck, 5);
     let mut test_women: HashMap<i32, Woman> = init_woman(5);
     marriage_stable(&mut test_deck, &mut test_women);

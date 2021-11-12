@@ -3,7 +3,7 @@ use crate::man::Man;
 pub(crate) struct Storage {men: Vec<Man>}
 
 pub (crate) trait Deck {
-    fn new(men: Vec<Man>) -> Self;
+    fn new() -> Self;
 
     fn add(&mut self, newly_single: Man);
 
@@ -11,8 +11,8 @@ pub (crate) trait Deck {
 }
 
 impl Deck for Storage {
-    fn new(men: Vec<Man>) -> Storage {
-        Storage {men}
+    fn new() -> Storage {
+        Storage {men : vec![]}
     }
 
     fn add(&mut self, newly_single: Man) {
