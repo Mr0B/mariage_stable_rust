@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+use std::ops::Deref;
 use crate::object::man::Man;
 
 #[derive(Clone)]
@@ -15,7 +17,7 @@ impl Woman{
         let position_pretending =self.preference.iter().position(|&r| r == pretending.name).unwrap();
         let position_favorite=self.preference.iter().position(|&r| r == self.favorite.name).unwrap_or(999999999);
         return if position_favorite > position_pretending {
-            let former_favorite = self.favorite().clone();
+            let former_favorite = self.favorite().to_owned();
             *self.favorite_mutable() = pretending;
             former_favorite
         } else {
