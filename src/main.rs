@@ -21,9 +21,10 @@ fn marriage_stable(deck: &mut Storage, women: &mut HashMap<i32, Woman>) {
             match woman_being_proposed_to {
                 None => { panic!("Something went wrong!") }
                 Some(woman) => {
-                    let dropped_man = woman.check_favorite(man_proposing);
-                    if dropped_man.name != -1 {
-                        deck.add(dropped_man);
+                    if let Some(dropped_man) = woman.check_favorite(man_proposing) {
+                        if dropped_man.name != -1 {
+                            deck.add(dropped_man);
+                        }
                     }
                 }
             }
