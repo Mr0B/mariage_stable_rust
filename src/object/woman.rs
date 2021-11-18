@@ -7,19 +7,27 @@ pub struct Woman {
     favorite: Man,
 }
 
-impl Woman{
+impl Woman {
     pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: Man) -> Woman {
         Woman { name, preference, favorite }
     }
-    pub(crate) fn check_favorite(&mut self, pretending: Man) -> Man {
-        let position_pretending =self.preference.iter().position(|&r| r == pretending.name).unwrap();
-        let position_favorite=self.preference.iter().position(|&r| r == self.favorite.name).unwrap_or(999999999);
-        return if position_favorite > position_pretending {
-            let former_favorite = self.favorite().clone();
-            *self.favorite_mutable() = pretending;
-            former_favorite
+
+    pub(crate) fn check_favorite(&mut self, pretending: Man) -> Option<Man> {
+        if let Some(position_pretending) = self.preference.iter().position(|&r| r == pretending.name) {
+            if let Some(position_favorite) = self.preference.iter().position(|&r| r == self.favorite.name) {
+                return if position_favorite > position_pretending {
+                    let former_favorite = self.favorite().to_owned();
+                    *self.favorite_mutable() = pretending;
+                    Some(former_favorite)
+                } else {
+                    Some(pretending)
+                };
+            } else {
+                *self.favorite_mutable() = pretending;
+                None
+            }
         } else {
-            pretending
+            panic!("This should never ever happen")
         }
     }
 

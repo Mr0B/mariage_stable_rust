@@ -1,24 +1,24 @@
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    use crate::{generate_preference, mariage_stable};
-    use crate::object::{deck, man, woman};
-    use crate::object::deck::Deck;
+    use crate::{generate_preference, marriage_stable};
+    use crate::object::{man, woman};
+    use crate::object::deck::{Deck, Storage};
     use crate::object::woman::Woman;
 
     #[test]
-    fn test_mariage_stable(){
-        let mut test_deck: Deck = deck::Deck::new(vec![]);
-        test_deck.put_at_the_end(man::Man::new(0, vec![2,1,3,0], 0));
-        test_deck.put_at_the_end(man::Man::new(1, vec![1,0,2,3], 0));
-        test_deck.put_at_the_end(man::Man::new(2, vec![1,3,0,2], 0));
-        test_deck.put_at_the_end(man::Man::new(3, vec![2,0,3,1], 0));
+    fn test_marriage_stable(){
+        let mut test_deck: Storage = Deck::new();
+        test_deck.add(man::Man::new(0, vec![2,1,3,0], -1));
+        test_deck.add(man::Man::new(1, vec![1,0,2,3], -1));
+        test_deck.add(man::Man::new(2, vec![1,3,0,2], -1));
+        test_deck.add(man::Man::new(3, vec![2,0,3,1], -1));
         let mut test_women: HashMap<i32, Woman> = HashMap::new();
         test_women.insert(0, woman::Woman::new(0,vec![0,1,3,2], man::Man::new(-1, generate_preference(0), -1)));
         test_women.insert(1, woman::Woman::new(1,vec![2,0,3,1], man::Man::new(-1, generate_preference(0), -1)));
         test_women.insert(2, woman::Woman::new(2,vec![2,1,3,0], man::Man::new(-1, generate_preference(0), -1)));
         test_women.insert(3, woman::Woman::new(3,vec![1,0,2,3], man::Man::new(-1, generate_preference(0), -1)));
-        mariage_stable(&mut test_deck, &mut test_women);
+        marriage_stable(&mut test_deck, &mut test_women);
         let clone_women = test_women;
         let woman_a = clone_women.get(&0);
         match woman_a {

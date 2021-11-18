@@ -10,15 +10,23 @@ impl Man{
         Man { name, preference, proposing_to }
     }
 
-    pub(crate) fn proposing_to(&self) -> &i32 {
+    pub(crate) fn find_next_woman(&mut self) -> Option<&i32> {
+        *self.proposing_to_mutable()=self.proposing_to()+1;
+        if let Some(target) = self.preference().get(*self.proposing_to() as usize){
+            return Some(target);
+        }
+        return None;
+    }
+
+    fn proposing_to(&self) -> &i32 {
         &self.proposing_to
     }
 
-    pub(crate) fn proposing_to_mutable(&mut self) -> &mut i32 {
+    fn proposing_to_mutable(&mut self) -> &mut i32 {
         &mut self.proposing_to
     }
 
-    pub(crate) fn preference(&self) -> &Vec<i32> {
+    fn preference(&self) -> &Vec<i32> {
         &self.preference
     }
 }
