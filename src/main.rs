@@ -1,4 +1,5 @@
 mod object;
+mod test_thread;
 mod test;
 
 use std::collections::HashMap;
