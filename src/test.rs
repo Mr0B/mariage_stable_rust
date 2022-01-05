@@ -20,25 +20,13 @@ mod tests {
         test_women.push(woman::Woman::new(3,vec![1,0,2,3], man::Man::new(-1, generate_preference(0), -1)));
         marriage_stable(&mut test_deck, &mut test_women);
         let clone_women = test_women;
-        let woman_a = clone_women[&0 as usize];
-        match woman_a {
-            None => {panic!()}
-            Some(woman) => {assert_eq!(woman.favorite().name, 1)}
-        }
-        let woman_b = clone_women[&1];
-        match woman_b {
-            None => {panic!()}
-            Some(woman) => {assert_eq!(woman.favorite().name, 2)}
-        }
-        let woman_c = clone_women[&2];
-        match woman_c {
-            None => {panic!()}
-            Some(woman) => {assert_eq!(woman.favorite().name, 3)}
-        }
-        let woman_d = clone_women[&3];
-        match woman_d {
-            None => {panic!()}
-            Some(woman) => {assert_eq!(woman.favorite().name, 0)}
-        }
+        let woman_a = &clone_women[0];
+        assert_eq!(woman_a.favorite().name, 1);
+        let woman_b = &clone_women[1];
+        assert_eq!(woman_b.favorite().name, 2);
+        let woman_c = &clone_women[2];
+        assert_eq!(woman_c.favorite().name, 3);
+        let woman_d = &clone_women[3];
+        assert_eq!(woman_d.favorite().name, 0);
     }
 }
