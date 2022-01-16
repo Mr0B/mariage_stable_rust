@@ -59,27 +59,24 @@ fn generate_preference(size: i32) -> Vec<i32> {
     my_vector
 }
 
-//fn find_rank_in_preference_list_of_couple(woman: Woman) -> (i32, i32) {
-//    let x: i32 = *woman.favorite().proposing_to();
-//    let mut y: i32 = 0;
-//    for element in woman.preference {
-//        y+=1;
-//        if element==woman.favorite().name {
-//            break
-//        }
-//    }
-//    return (x,y)
-//}
-
 fn print_couples(women: Vec<Woman>) {
+    let mut i = 0;
+    println!("|          | Woman | preference_woman | Man | preference_man  |");
     for woman in women {
+        i += 1;
+        let woman_list = format!("{:?}", woman.preference);
+        let man_list = format!("{:?}", woman.favorite().preference);
         println!(
             "{}",
             format!(
-                "woman {woman} is paired with man {man}",
+                "| couple {iterator} |   {woman}   | {preference_woman}  |  {man}  | {preference_man} |",
+                iterator = i,
                 woman = woman.name,
-                man = woman.favorite().name
+                preference_woman = woman_list,
+                man = woman.favorite().name,
+                preference_man = man_list
             )
-        )
+        );
+        println!("---------------------------------------------------------------");
     }
 }
