@@ -9,12 +9,22 @@ pub struct Woman {
 
 impl Woman {
     pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: Man) -> Woman {
-        Woman { name, preference, favorite }
+        Woman {
+            name,
+            preference,
+            favorite,
+        }
     }
 
     pub(crate) fn check_favorite(&mut self, pretending: Man) -> Option<Man> {
-        if let Some(position_pretending) = self.preference.iter().position(|&r| r == pretending.name) {
-            if let Some(position_favorite) = self.preference.iter().position(|&r| r == self.favorite.name) {
+        if let Some(position_pretending) =
+            self.preference.iter().position(|&r| r == pretending.name)
+        {
+            if let Some(position_favorite) = self
+                .preference
+                .iter()
+                .position(|&r| r == self.favorite.name)
+            {
                 return if position_favorite > position_pretending {
                     let former_favorite = self.favorite().to_owned();
                     *self.favorite_mutable() = pretending;

@@ -1,15 +1,15 @@
 mod object;
-mod test_thread;
 mod test;
+mod test_thread;
 
-use std::collections::HashMap;
-use std::sync::{Arc, mpsc, Mutex};
-use std::thread;
-use std::thread::JoinHandle;
-use rand::prelude::SliceRandom;
-use crate::object::{man, woman};
 use crate::object::deck::*;
 use crate::object::woman::*;
+use crate::object::{man, woman};
+use rand::prelude::SliceRandom;
+use std::collections::HashMap;
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread;
+use std::thread::JoinHandle;
 
 fn main() {
     let mut test_deck: Storage = Deck::new();
@@ -23,11 +23,11 @@ fn marriage_stable(deck: &mut Storage, women: &mut Vec<Woman>) {
     while let Some(mut man_proposing) = deck.pop() {
         if let Some(target) = man_proposing.find_next_woman() {
             let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
-                if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
-                    if dropped_man.name != -1 {
-                        deck.add(dropped_man);
-                    }
+            if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
+                if dropped_man.name != -1 {
+                    deck.add(dropped_man);
                 }
+            }
         }
     }
 }
@@ -42,7 +42,11 @@ fn init_men(deck: &mut Storage, number: i32) {
 fn init_woman(number: i32) -> Vec<Woman> {
     let mut women = vec![];
     for i in 0..number {
-        let woman_holder = woman::Woman::new(i, generate_preference(number), man::Man::new(-1, generate_preference(0), -1));
+        let woman_holder = woman::Woman::new(
+            i,
+            generate_preference(number),
+            man::Man::new(-1, generate_preference(0), -1),
+        );
         women.push(woman_holder);
     }
     return women;
@@ -68,7 +72,14 @@ fn generate_preference(size: i32) -> Vec<i32> {
 //}
 
 fn print_couples(women: Vec<Woman>) {
-    for woman in women  {
-        println!("{}", format!("woman {woman} is paired with man {man}", woman=woman.name, man=woman.favorite().name))
+    for woman in women {
+        println!(
+            "{}",
+            format!(
+                "woman {woman} is paired with man {man}",
+                woman = woman.name,
+                man = woman.favorite().name
+            )
+        )
     }
 }

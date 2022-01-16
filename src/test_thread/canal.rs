@@ -3,7 +3,7 @@ use std::thread;
 use std::time::Duration;
 
 #[allow(dead_code)]
-pub(crate) fn canal(){
+pub(crate) fn canal() {
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
