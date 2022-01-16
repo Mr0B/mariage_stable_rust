@@ -18,7 +18,7 @@ impl Man{
         return None;
     }
 
-    fn proposing_to(&self) -> &i32 {
+    pub(crate) fn proposing_to(&self) -> &i32 {
         &self.proposing_to
     }
 
