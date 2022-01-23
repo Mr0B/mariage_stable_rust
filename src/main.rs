@@ -12,9 +12,10 @@ use std::thread;
 use std::thread::JoinHandle;
 
 fn main() {
+    let size_of_list: i32 = 5;
     let mut test_deck: Storage = Deck::new();
-    init_men(&mut test_deck, 5);
-    let mut test_women: Vec<Woman> = init_woman(5);
+    init_men(&mut test_deck, size_of_list);
+    let mut test_women: Vec<Woman> = init_woman(size_of_list);
     marriage_stable(&mut test_deck, &mut test_women);
     print_couples(test_women);
 }
