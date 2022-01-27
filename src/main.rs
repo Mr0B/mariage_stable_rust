@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 mod object;
 mod test;
 mod test_thread;
