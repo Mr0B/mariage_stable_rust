@@ -1,11 +1,15 @@
-use std::sync::Mutex;
 use crate::man::Man;
+use std::sync::Mutex;
 
-pub(crate) struct Storage {men: Vec<Man>}
+pub(crate) struct Storage {
+    men: Vec<Man>,
+}
 
-pub(crate) struct MutexStorage {men_mutex: Mutex<Vec<Man>>}
+pub(crate) struct MutexStorage {
+    men_mutex: Mutex<Vec<Man>>,
+}
 
-pub (crate) trait Deck {
+pub(crate) trait Deck {
     fn new() -> Self;
 
     fn add(&mut self, newly_single: Man);
@@ -15,7 +19,7 @@ pub (crate) trait Deck {
 
 impl Deck for Storage {
     fn new() -> Storage {
-        Storage {men : vec![]}
+        Storage { men: vec![] }
     }
 
     fn add(&mut self, newly_single: Man) {
@@ -29,7 +33,9 @@ impl Deck for Storage {
 
 impl Deck for MutexStorage {
     fn new() -> MutexStorage {
-        MutexStorage {men_mutex : Mutex::new(vec![])}
+        MutexStorage {
+            men_mutex: Mutex::new(vec![]),
+        }
     }
 
     fn add(&mut self, newly_single: Man) {

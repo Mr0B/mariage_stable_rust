@@ -1,7 +1,7 @@
-use std::thread;
-use std::time::Duration;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::Duration;
 
 //exemple tirer de https://doc.rust-lang.org/book/ch16-00-concurrency.html
 #[allow(dead_code)]
@@ -76,7 +76,6 @@ pub(crate) fn thread05() {
     let received = rx.recv().unwrap();
     println!("Got: {}", received);
 }
-
 
 #[allow(dead_code)]
 pub(crate) fn thread06() {
