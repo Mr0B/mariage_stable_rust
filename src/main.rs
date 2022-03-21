@@ -17,11 +17,11 @@ fn main() {
     let mut test_deck: Storage = Deck::new();
     init_men(&mut test_deck, size_of_list);
     let mut test_women: Vec<Woman> = init_woman(size_of_list);
-    marriage_stable(&mut test_deck, &mut test_women);
+    marriage_stable_sequential(&mut test_deck, &mut test_women);
     print_couples(test_women);
 }
 
-fn marriage_stable(deck: &mut Storage, women: &mut Vec<Woman>) {
+fn marriage_stable_sequential(deck: &mut Storage, women: &mut Vec<Woman>) {
     while let Some(mut man_proposing) = deck.pop() {
         if let Some(target) = man_proposing.find_next_woman() {
             let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
@@ -31,6 +31,32 @@ fn marriage_stable(deck: &mut Storage, women: &mut Vec<Woman>) {
                 }
             }
         }
+    }
+}
+
+fn marriage_stable_parallel(deck: &mut MutexStorage, women: &mut Vec<Woman>) {
+    let mut handles: Vec<JoinHandle<()>> = vec![];
+    let deck = Arc::new(deck);
+    for _ in 0..2 {
+        let handle = thread::spawn(move || {
+            let mut deck = Arc::clone(&deck);
+            while let Some(mut man_proposing) = deck.pop() {
+                if let Some(target) = man_proposing.find_next_woman() {
+                    let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
+
+                    if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing)
+                    {
+                        if dropped_man.name != -1 {
+                            deck.add(dropped_man);
+                        }
+                    }
+                }
+            }
+        });
+        handles.push(handle)
+    }
+    for handle in handles {
+        handle.join().unwrap();
     }
 }
 
