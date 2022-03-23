@@ -3,14 +3,18 @@ mod object;
 mod test;
 mod test_thread;
 
+use std::borrow::Borrow;
 use crate::object::deck::*;
 use crate::object::woman::*;
-use crate::object::{man, woman};
+use crate::object::man::*;
+use crate::object::test_instances::*;
 use rand::prelude::SliceRandom;
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
+use crate::object::{man, woman,test_instances};
 
 fn main() {
     let size_of_list: i32 = 5;
@@ -18,7 +22,8 @@ fn main() {
     init_men(&mut test_deck, size_of_list);
     let mut test_women: Vec<Woman> = init_woman(size_of_list);
     marriage_stable_sequential(&mut test_deck, &mut test_women);
-    print_couples(test_women);
+    marriage_stable_parallel(test_deck, test_women);
+    //print_couples(test_women);
 }
 
 fn marriage_stable_sequential(deck: &mut Storage, women: &mut Vec<Woman>) {
@@ -34,29 +39,15 @@ fn marriage_stable_sequential(deck: &mut Storage, women: &mut Vec<Woman>) {
     }
 }
 
-fn marriage_stable_parallel(deck: &mut MutexStorage, women: &mut Vec<Woman>) {
+fn marriage_stable_parallel(deck: Storage, women: Vec<Woman>) {
+    let instance = Arc::new(init_instance(deck, women));
     let mut handles: Vec<JoinHandle<()>> = vec![];
-    let deck = Arc::new(deck);
     for _ in 0..2 {
+        let instance = Arc::clone(&instance);
         let handle = thread::spawn(move || {
-            let mut deck = Arc::clone(&deck);
-            while let Some(mut man_proposing) = deck.pop() {
-                if let Some(target) = man_proposing.find_next_woman() {
-                    let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
 
-                    if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing)
-                    {
-                        if dropped_man.name != -1 {
-                            deck.add(dropped_man);
-                        }
-                    }
-                }
             }
         });
-        handles.push(handle)
-    }
-    for handle in handles {
-        handle.join().unwrap();
     }
 }
 
@@ -78,6 +69,18 @@ fn init_woman(number: i32) -> Vec<Woman> {
         women.push(woman_holder);
     }
     return women;
+}
+
+fn init_instance(mut deck: Storage, women: Vec<Woman>) -> TestInstances {
+    let mut mutex_deck: MutexStorage = MutexStorage::new();
+    let mut mutex_women: Vec<Mutex<Woman>> = vec![];
+    while let Some(man)=deck.pop(){
+        mutex_deck.add(man);
+    }
+    for woman in women  {
+        mutex_women.push(Mutex::new(woman))
+    }
+    TestInstances::new(mutex_deck,mutex_women)
 }
 
 fn generate_preference(size: i32) -> Vec<i32> {
