@@ -1,20 +1,20 @@
+use crate::{Deck, Man, MutexStorage, Storage, Woman};
 use std::sync::Mutex;
-use crate::{Deck, MutexStorage, Storage, Woman};
 
-pub(crate) struct  TestInstances {
-    pub(crate) list_man: MutexStorage,
+pub(crate) struct TestInstances {
+    pub(crate) list_man: MutexStorage<Man>,
     pub(crate) list_woman: Vec<Mutex<Woman>>,
 }
 
 impl TestInstances {
-    pub(crate) fn new(list_man: MutexStorage, list_woman: Vec<Mutex<Woman>>) -> TestInstances {
+    pub(crate) fn new(list_man: MutexStorage<Man>, list_woman: Vec<Mutex<Woman>>) -> TestInstances {
         TestInstances {
             list_man,
             list_woman,
         }
     }
 
-    pub(crate) fn list_man_mutable(&mut self) -> &mut MutexStorage {
+    pub(crate) fn list_man_mutable(&mut self) -> &mut MutexStorage<Man> {
         &mut self.list_man
     }
 

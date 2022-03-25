@@ -1,48 +1,48 @@
 use crate::man::Man;
 use std::sync::Mutex;
 
-pub(crate) struct Storage {
-    men: Vec<Man>,
+pub(crate) struct Storage<T> {
+    men: Vec<T>,
 }
 
-pub(crate) struct MutexStorage {
-    men_mutex: Mutex<Vec<Man>>,
+pub(crate) struct MutexStorage<T> {
+    men_mutex: Mutex<Vec<T>>,
 }
 
-pub(crate) trait Deck {
+pub(crate) trait Deck<T> {
     fn new() -> Self;
 
-    fn add(&mut self, newly_single: Man);
+    fn add(&mut self, newly_single: T);
 
-    fn pop(&mut self) -> Option<Man>;
+    fn pop(&mut self) -> Option<T>;
 }
 
-impl Deck for Storage {
-    fn new() -> Storage {
+impl<T> Deck<T> for Storage<T> {
+    fn new() -> Storage<T> {
         Storage { men: vec![] }
     }
 
-    fn add(&mut self, newly_single: Man) {
+    fn add(&mut self, newly_single: T) {
         self.men.push(newly_single);
     }
 
-    fn pop(&mut self) -> Option<Man> {
+    fn pop(&mut self) -> Option<T> {
         self.men.pop()
     }
 }
 
-impl Deck for MutexStorage {
-    fn new() -> MutexStorage {
+impl<T> Deck<T> for MutexStorage<T> {
+    fn new() -> MutexStorage<T> {
         MutexStorage {
             men_mutex: Mutex::new(vec![]),
         }
     }
 
-    fn add(&mut self, newly_single: Man) {
+    fn add(&mut self, newly_single: T) {
         self.men_mutex.lock().unwrap().push(newly_single);
     }
 
-    fn pop(&mut self) -> Option<Man> {
+    fn pop(&mut self) -> Option<T> {
         self.men_mutex.lock().unwrap().pop()
     }
 }
