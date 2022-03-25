@@ -21,7 +21,7 @@ fn main() {
     let mut test_deck: Storage<Man> = Deck::new();
     init_men(&mut test_deck, size_of_list);
     let mut test_women: Vec<Woman> = init_woman(size_of_list);
-    //marriage_stable_sequential(&mut test_deck, &mut test_women);
+    marriage_stable_sequential(&mut test_deck, &mut test_women);
     //clone les inputs
     marriage_stable_parallel(test_deck, test_women);
     //print_couples(test_women);
@@ -40,34 +40,26 @@ fn marriage_stable_sequential(deck: &mut Storage<Man>, women: &mut Vec<Woman>) {
     }
 }
 
-/*pub struct TrucCon {
-    pub instance : Arc<Mutex<TestInstances>>
-}
-
-impl TrucCon {
-    fn go(&self) {
-        let toto = self.instance.lock().unwrap().list_man.pop();
-    }
-}*/
-
 fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
     let instance = init_instance(deck, women);
     let mut handles: Vec<JoinHandle<()>> = vec![];
     for _ in 0..2 {
-        println!("a");
         let instance = Arc::clone(&instance);
         let handle = thread::spawn(move || {
-            while let Some(mut man) = instance.lock().unwrap().list_man.pop() {
-                println!("b");
-                if let Some(target) = man.find_next_woman() {
-                    println!("c");
-                    let temp_women = &instance.lock().unwrap().list_woman;
-                    let mut woman_proposed_to = temp_women[*target as usize].lock().unwrap();
-                    if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
-                        println!("e");
-                        if dropped_man.name != -1 {
-                            println!("f");
-                            instance.lock().unwrap().list_man.add(dropped_man);
+            loop {
+                //while let Some(mut man) = instance.list_man.lock().unwrap().pop() {
+                let variable = instance.list_man.lock().unwrap().pop();
+                match variable {
+                    None => break,
+                    Some(mut man) => {
+                        if let Some(target) = man.find_next_woman() {
+                            let mut woman_proposed_to =
+                                instance.list_woman[(*target as usize)].lock().unwrap();
+                            if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
+                                if dropped_man.name != -1 {
+                                    instance.list_man.lock().unwrap().add(dropped_man);
+                                }
+                            }
                         }
                     }
                 }
@@ -79,12 +71,8 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
         handle.join().unwrap();
         println!("d");
     }
-    /*
-     let instance = Arc::try_unwrap(instance).ok().unwrap();
-     print_couples(&mutex_women_to_women(
-        instance.into_inner().unwrap().list_woman,
-    ));
-    */
+    let instance = Arc::try_unwrap(instance).ok().unwrap();
+    print_couples(&mutex_women_to_women(instance.list_woman));
 }
 
 fn init_men(deck: &mut Storage<Man>, number: i32) {
@@ -107,16 +95,12 @@ fn init_woman(number: i32) -> Vec<Woman> {
     return women;
 }
 
-fn init_instance(mut deck: Storage<Man>, women: Vec<Woman>) -> Arc<Mutex<TestInstances>> {
-    let mut mutex_deck: MutexStorage<Man> = MutexStorage::new();
+fn init_instance(mut deck: Storage<Man>, women: Vec<Woman>) -> Arc<TestInstances> {
     let mut mutex_women: Vec<Mutex<Woman>> = vec![];
-    while let Some(man) = deck.pop() {
-        mutex_deck.add(man);
-    }
     for woman in women {
         mutex_women.push(Mutex::new(woman))
     }
-    Arc::new(Mutex::new(TestInstances::new(mutex_deck, mutex_women)))
+    Arc::new(TestInstances::new(Mutex::new(deck), mutex_women))
 }
 
 fn mutex_women_to_women(mutex_women: Vec<Mutex<Woman>>) -> Vec<Woman> {
