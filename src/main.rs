@@ -21,8 +21,8 @@ fn main() {
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_of_list);
     let mut women: Vec<Woman> = init_woman(size_of_list);
-    let deck_parallel=deck.clone();
-    let women_parallel= women.clone();
+    let deck_parallel = deck.clone();
+    let women_parallel = women.clone();
     marriage_stable_sequential(&mut deck, &mut women);
     marriage_stable_parallel(deck_parallel, women_parallel);
 }
@@ -46,19 +46,17 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
     let mut handles: Vec<JoinHandle<()>> = vec![];
     for _ in 0..2 {
         let instance = Arc::clone(&instance);
-        let handle = thread::spawn(move || {
-            loop {
-                let variable = instance.list_man.lock().unwrap().pop();
-                match variable {
-                    None => break,
-                    Some(mut man) => {
-                        if let Some(target) = man.find_next_woman() {
-                            let mut woman_proposed_to =
-                                instance.list_woman[(*target as usize)].lock().unwrap();
-                            if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
-                                if dropped_man.name != -1 {
-                                    instance.list_man.lock().unwrap().add(dropped_man);
-                                }
+        let handle = thread::spawn(move || loop {
+            let variable = instance.list_man.lock().unwrap().pop();
+            match variable {
+                None => break,
+                Some(mut man) => {
+                    if let Some(target) = man.find_next_woman() {
+                        let mut woman_proposed_to =
+                            instance.list_woman[(*target as usize)].lock().unwrap();
+                        if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
+                            if dropped_man.name != -1 {
+                                instance.list_man.lock().unwrap().add(dropped_man);
                             }
                         }
                     }
@@ -84,11 +82,7 @@ fn init_men(deck: &mut Storage<Man>, number: i32) {
 fn init_woman(number: i32) -> Vec<Woman> {
     let mut women = vec![];
     for i in 0..number {
-        let woman_holder = woman::Woman::new(
-            i,
-            generate_preference(number),
-            man::Man::new(-1, generate_preference(0), -1),
-        );
+        let woman_holder = woman::Woman::new(i, generate_preference(number), None);
         women.push(woman_holder);
     }
     return women;
@@ -122,19 +116,27 @@ fn print_couples(women: &Vec<Woman>) {
     println!("|          | Woman | preference_woman | Man | preference_man  |");
     for woman in women {
         i += 1;
-        let woman_list = format!("{:?}", woman.preference);
-        let man_list = format!("{:?}", woman.favorite().preference);
-        println!(
-            "{}",
-            format!(
-                "| couple {iterator} |   {woman}   | {preference_woman}  |  {man}  | {preference_man} |",
-                iterator = i,
-                woman = woman.name,
-                preference_woman = woman_list,
-                man = woman.favorite().name,
-                preference_man = man_list
-            )
-        );
-        println!("---------------------------------------------------------------");
+        let man_of_woman = woman.favorite().clone();
+        match man_of_woman {
+            None => {
+                println!("dafuq is happening")
+            }
+            Some(man) => {
+                let woman_list = format!("{:?}", woman.preference);
+                let man_list = format!("{:?}", man.preference);
+                println!(
+                    "{}",
+                    format!(
+                        "| couple {iterator} |   {woman}   | {preference_woman}  |  {man}  | {preference_man} |",
+                        iterator = i,
+                        woman = woman.name,
+                        preference_woman = woman_list,
+                        man = man.name,
+                        preference_man = man_list
+                    )
+                );
+                println!("---------------------------------------------------------------");
+            }
+        }
     }
 }

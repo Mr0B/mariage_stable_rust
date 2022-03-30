@@ -4,11 +4,11 @@ use crate::object::man::Man;
 pub struct Woman {
     pub name: i32,
     pub preference: Vec<i32>,
-    favorite: Man,
+    favorite: Option<Man>,
 }
 
 impl Woman {
-    pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: Man) -> Woman {
+    pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: Option<Man>) -> Woman {
         Woman {
             name,
             preference,
@@ -20,20 +20,21 @@ impl Woman {
         if let Some(position_pretending) =
             self.preference.iter().position(|&r| r == pretending.name)
         {
-            if let Some(position_favorite) = self
-                .preference
-                .iter()
-                .position(|&r| r == self.favorite.name)
-            {
+            if let Some(position_favorite) = self.preference.iter().position(|&r| {
+                r == match &self.favorite {
+                    None => -1,
+                    Some(man) => man.name,
+                }
+            }) {
                 return if position_favorite > position_pretending {
                     let former_favorite = self.favorite().to_owned();
-                    *self.favorite_mutable() = pretending;
-                    Some(former_favorite)
+                    *self.favorite_mutable() = Some(pretending);
+                    former_favorite
                 } else {
                     Some(pretending)
                 };
             } else {
-                *self.favorite_mutable() = pretending;
+                *self.favorite_mutable() = Some(pretending);
                 None
             }
         } else {
@@ -41,11 +42,11 @@ impl Woman {
         }
     }
 
-    pub(crate) fn favorite(&self) -> &Man {
+    pub(crate) fn favorite(&self) -> &Option<Man> {
         &self.favorite
     }
 
-    pub(crate) fn favorite_mutable(&mut self) -> &mut Man {
+    pub(crate) fn favorite_mutable(&mut self) -> &mut Option<Man> {
         &mut self.favorite
     }
 }
