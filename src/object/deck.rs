@@ -1,6 +1,6 @@
 use crate::man::Man;
 use std::sync::Mutex;
-
+#[derive(Clone)]
 pub(crate) struct Storage<T> {
     men: Vec<T>,
 }

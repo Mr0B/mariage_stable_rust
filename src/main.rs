@@ -18,13 +18,13 @@ use std::thread::JoinHandle;
 
 fn main() {
     let size_of_list: i32 = 5;
-    let mut test_deck: Storage<Man> = Deck::new();
-    init_men(&mut test_deck, size_of_list);
-    let mut test_women: Vec<Woman> = init_woman(size_of_list);
-    marriage_stable_sequential(&mut test_deck, &mut test_women);
-    //clone les inputs
-    marriage_stable_parallel(test_deck, test_women);
-    //print_couples(test_women);
+    let mut deck: Storage<Man> = Deck::new();
+    init_men(&mut deck, size_of_list);
+    let mut women: Vec<Woman> = init_woman(size_of_list);
+    let deck_parallel=deck.clone();
+    let women_parallel= women.clone();
+    marriage_stable_sequential(&mut deck, &mut women);
+    marriage_stable_parallel(deck_parallel, women_parallel);
 }
 
 fn marriage_stable_sequential(deck: &mut Storage<Man>, women: &mut Vec<Woman>) {
@@ -38,6 +38,7 @@ fn marriage_stable_sequential(deck: &mut Storage<Man>, women: &mut Vec<Woman>) {
             }
         }
     }
+    print_couples(women);
 }
 
 fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
@@ -47,7 +48,6 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
         let instance = Arc::clone(&instance);
         let handle = thread::spawn(move || {
             loop {
-                //while let Some(mut man) = instance.list_man.lock().unwrap().pop() {
                 let variable = instance.list_man.lock().unwrap().pop();
                 match variable {
                     None => break,
@@ -69,7 +69,6 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
     }
     for handle in handles {
         handle.join().unwrap();
-        println!("d");
     }
     let instance = Arc::try_unwrap(instance).ok().unwrap();
     print_couples(&mutex_women_to_women(instance.list_woman));
@@ -95,7 +94,7 @@ fn init_woman(number: i32) -> Vec<Woman> {
     return women;
 }
 
-fn init_instance(mut deck: Storage<Man>, women: Vec<Woman>) -> Arc<TestInstances> {
+fn init_instance(deck: Storage<Man>, women: Vec<Woman>) -> Arc<TestInstances> {
     let mut mutex_women: Vec<Mutex<Woman>> = vec![];
     for woman in women {
         mutex_women.push(Mutex::new(woman))
