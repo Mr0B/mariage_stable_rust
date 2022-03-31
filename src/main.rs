@@ -5,9 +5,10 @@ mod test_thread;
 
 use crate::object::deck::*;
 use crate::object::man::*;
+use crate::object::result::*;
 use crate::object::test_instances::*;
 use crate::object::woman::*;
-use crate::object::{man, test_instances, woman};
+use crate::object::{man, result, test_instances, woman};
 use rand::prelude::SliceRandom;
 use std::borrow::Borrow;
 use std::collections::HashMap;
@@ -20,14 +21,16 @@ fn main() {
     let size_of_list: i32 = 5;
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_of_list);
-    let mut women: Vec<Woman> = init_woman(size_of_list);
+    let women: Vec<Woman> = init_woman(size_of_list);
     let deck_parallel = deck.clone();
     let women_parallel = women.clone();
-    marriage_stable_sequential(&mut deck, &mut women);
-    marriage_stable_parallel(deck_parallel, women_parallel);
+    let result_sequential = marriage_stable_sequential(deck, women);
+    let result_parallel = marriage_stable_parallel(deck_parallel, women_parallel);
+    print_couples(result_sequential.paired_women());
+    print_couples(result_parallel.paired_women());
 }
 
-fn marriage_stable_sequential(deck: &mut Storage<Man>, women: &mut Vec<Woman>) {
+fn marriage_stable_sequential(mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
     while let Some(mut man_proposing) = deck.pop() {
         if let Some(target) = man_proposing.find_next_woman() {
             let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
@@ -36,10 +39,10 @@ fn marriage_stable_sequential(deck: &mut Storage<Man>, women: &mut Vec<Woman>) {
             }
         }
     }
-    print_couples(women);
+    result::Resultant::new(women)
 }
 
-fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
+fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) -> Resultant {
     let instance = init_instance(deck, women);
     let mut handles: Vec<JoinHandle<()>> = vec![];
     for _ in 0..2 {
@@ -65,7 +68,7 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
         handle.join().unwrap();
     }
     let instance = Arc::try_unwrap(instance).ok().unwrap();
-    print_couples(&mutex_women_to_women(instance.list_woman));
+    result::Resultant::new(mutex_women_to_women(instance.list_woman))
 }
 
 fn init_men(deck: &mut Storage<Man>, number: i32) {
