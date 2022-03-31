@@ -32,9 +32,7 @@ fn marriage_stable_sequential(deck: &mut Storage<Man>, women: &mut Vec<Woman>) {
         if let Some(target) = man_proposing.find_next_woman() {
             let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
             if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
-                if dropped_man.name != -1 {
-                    deck.add(dropped_man);
-                }
+                deck.add(dropped_man);
             }
         }
     }
@@ -55,9 +53,7 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) {
                         let mut woman_proposed_to =
                             instance.list_woman[(*target as usize)].lock().unwrap();
                         if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
-                            if dropped_man.name != -1 {
-                                instance.list_man.lock().unwrap().add(dropped_man);
-                            }
+                            instance.list_man.lock().unwrap().add(dropped_man);
                         }
                     }
                 }
@@ -116,7 +112,7 @@ fn print_couples(women: &Vec<Woman>) {
     println!("|          | Woman | preference_woman | Man | preference_man  |");
     for woman in women {
         i += 1;
-        let man_of_woman = woman.favorite().clone();
+        let man_of_woman = woman.favorite();
         match man_of_woman {
             None => {
                 println!("dafuq is happening")
