@@ -3,3 +3,4 @@ pub mod man;
 pub mod test_instances;
 pub mod woman;
 pub mod result;
+pub mod algo;
