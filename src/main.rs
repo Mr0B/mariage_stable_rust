@@ -22,12 +22,14 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
+use crate::object::preference_generator::PreferenceGenerator;
 
 fn main() {
     let size_of_list: usize = 5;
+    let mut random_generator = PreferenceGenerator::new(27);
     let mut deck: Storage<Man> = Deck::new();
-    init_men(&mut deck, size_of_list);
-    let women: Vec<Woman> = init_woman(size_of_list);
+    init_men(&mut deck, size_of_list, &mut random_generator);
+    let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
     let deck_parallel = deck.clone();
     let women_parallel = women.clone();
     //let now = Instant::now();
@@ -106,17 +108,17 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) -> Resultant 
     Resultant::new(mutex_women_to_women(instance.list_woman), Parallel)
 }
 
-fn init_men(deck: &mut Storage<Man>, number: usize) {
+fn init_men(deck: &mut Storage<Man>, number: usize, random_generator: &mut PreferenceGenerator) {
     for i in 1..(number + 1) {
-        let man_holder = man::Man::new(i, generate_preference(number), 0);
+        let man_holder = man::Man::new(i, random_generator.generate_preference(number), 0);
         deck.add(man_holder);
     }
 }
 
-fn init_woman(number: usize) -> Vec<Woman> {
+fn init_woman(number: usize, random_generator: &mut PreferenceGenerator) -> Vec<Woman> {
     let mut women = vec![];
     for i in 1..(number + 1) {
-        let woman_holder = woman::Woman::new(i, generate_preference(number), None);
+        let woman_holder = woman::Woman::new(i, random_generator.generate_preference(number), None);
         women.push(woman_holder);
     }
     return women;
@@ -138,14 +140,14 @@ fn mutex_women_to_women(mutex_women: Vec<Mutex<Woman>>) -> Vec<Woman> {
     women
 }
 
-fn generate_preference(size: usize) -> Vec<usize> {
+/*fn generate_preference(size: usize) -> Vec<usize> {
     let mut my_vector: Vec<usize> = (1..size + 1).map(|x| x).collect();
     let mut rng = rand::thread_rng();
     //let mut test = StdRng::seed_from_u64(28);
     my_vector.shuffle(&mut rng);
     //my_vector.shuffle(&mut test);
     my_vector
-}
+}*/
 
 fn print_couples(women: &Vec<Woman>) {
     let mut i = 0;
