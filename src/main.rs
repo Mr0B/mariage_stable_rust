@@ -17,26 +17,27 @@ use rand::SeedableRng;
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::ops::Deref;
+use std::ptr::null;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
 
 fn main() {
-    let size_of_list: i32 = 500;
+    let size_of_list: usize = 5;
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_of_list);
     let women: Vec<Woman> = init_woman(size_of_list);
     let deck_parallel = deck.clone();
     let women_parallel = women.clone();
-    let now = Instant::now();
-    let _result_sequential = marriage_stable_sequential(deck, women);
-    println!("{}", now.elapsed().as_micros());
-    let now_2 = Instant::now();
-    let _result_parallel = marriage_stable_parallel(deck_parallel, women_parallel);
-    println!("{}", now_2.elapsed().as_micros());
-    //print_couples(result_sequential.paired_women());
-    //print_couples(result_parallel.paired_women());
+    //let now = Instant::now();
+    let result_sequential = marriage_stable_sequential(deck, women);
+    //println!("{}", now.elapsed().as_micros());
+    //let now_2 = Instant::now();
+    let result_parallel = marriage_stable_parallel(deck_parallel, women_parallel);
+    //println!("{}", now_2.elapsed().as_micros());
+    print_couples(result_sequential.paired_women());
+    print_couples(result_parallel.paired_women());
 }
 
 // fn resolve(algo: Algo, size_instance: i32) -> Resultant {
@@ -60,7 +61,7 @@ fn main() {
 fn marriage_stable_sequential(mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
     while let Some(mut man_proposing) = deck.pop() {
         if let Some(target) = man_proposing.find_next_woman() {
-            let woman_being_proposed_to: &mut Woman = &mut women[(*target) as usize];
+            let woman_being_proposed_to: &mut Woman = &mut women[(*target) - 1];
             if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
                 deck.add(dropped_man);
             }
@@ -72,22 +73,22 @@ fn marriage_stable_sequential(mut deck: Storage<Man>, mut women: Vec<Woman>) -> 
 fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) -> Resultant {
     let instance = init_instance(deck, women);
     let mut handles: Vec<JoinHandle<()>> = vec![];
-    for i in 0..8 {
+    for _i in 0..8 {
         let instance = Arc::clone(&instance);
         let handle = thread::spawn(move || {
-            let mut compteur = 0;
+            //let mut compteur = 0;
             loop {
-                compteur += 1;
+                //compteur += 1;
                 let variable = instance.list_man.lock().unwrap().pop();
                 match variable {
                     None => {
-                        println!("thread numéro: {} a un compteur {}", i, compteur);
+                        //println!("thread numéro: {} a un compteur {}", i, compteur);
                         break;
                     }
                     Some(mut man) => {
                         if let Some(target) = man.find_next_woman() {
                             let mut woman_proposed_to =
-                                instance.list_woman[(*target as usize)].lock().unwrap();
+                                instance.list_woman[(*target) - 1].lock().unwrap();
                             if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
                                 instance.list_man.lock().unwrap().add(dropped_man);
                             }
@@ -105,16 +106,16 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) -> Resultant 
     Resultant::new(mutex_women_to_women(instance.list_woman), Parallel)
 }
 
-fn init_men(deck: &mut Storage<Man>, number: i32) {
-    for i in 0..number {
-        let man_holder = man::Man::new(i, generate_preference(number), -1);
+fn init_men(deck: &mut Storage<Man>, number: usize) {
+    for i in 1..(number + 1) {
+        let man_holder = man::Man::new(i, generate_preference(number), 0);
         deck.add(man_holder);
     }
 }
 
-fn init_woman(number: i32) -> Vec<Woman> {
+fn init_woman(number: usize) -> Vec<Woman> {
     let mut women = vec![];
-    for i in 0..number {
+    for i in 1..(number + 1) {
         let woman_holder = woman::Woman::new(i, generate_preference(number), None);
         women.push(woman_holder);
     }
@@ -137,12 +138,12 @@ fn mutex_women_to_women(mutex_women: Vec<Mutex<Woman>>) -> Vec<Woman> {
     women
 }
 
-fn generate_preference(size: i32) -> Vec<i32> {
-    let mut my_vector: Vec<i32> = (0..size).map(|x| x).collect();
-    //let mut rng = rand::thread_rng();
-    let mut test = StdRng::seed_from_u64(27);
-    //my_vector.shuffle(&mut rng);
-    my_vector.shuffle(&mut test);
+fn generate_preference(size: usize) -> Vec<usize> {
+    let mut my_vector: Vec<usize> = (1..size + 1).map(|x| x).collect();
+    let mut rng = rand::thread_rng();
+    //let mut test = StdRng::seed_from_u64(28);
+    my_vector.shuffle(&mut rng);
+    //my_vector.shuffle(&mut test);
     my_vector
 }
 
@@ -154,7 +155,7 @@ fn print_couples(women: &Vec<Woman>) {
         let man_of_woman = woman.favorite();
         match man_of_woman {
             None => {
-                println!("dafuq is happening")
+                println!("daf is happening")
             }
             Some(man) => {
                 let woman_list = format!("{:?}", woman.preference);

@@ -1,12 +1,12 @@
 #[derive(Clone)]
 pub struct Man {
-    pub name: i32,
-    pub preference: Vec<i32>,
-    proposing_to: i32,
+    pub name: usize,
+    pub preference: Vec<usize>,
+    proposing_to: usize,
 }
 
 impl Man {
-    pub(crate) fn new(name: i32, preference: Vec<i32>, proposing_to: i32) -> Man {
+    pub(crate) fn new(name: usize, preference: Vec<usize>, proposing_to: usize) -> Man {
         Man {
             name,
             preference,
@@ -14,23 +14,23 @@ impl Man {
         }
     }
 
-    pub(crate) fn find_next_woman(&mut self) -> Option<&i32> {
+    pub(crate) fn find_next_woman(&mut self) -> Option<&usize> {
         *self.proposing_to_mutable() = self.proposing_to() + 1;
-        if let Some(target) = self.preference().get(*self.proposing_to() as usize) {
+        if let Some(target) = self.preference().get(*self.proposing_to()) {
             return Some(target);
         }
         return None;
     }
 
-    pub(crate) fn proposing_to(&self) -> &i32 {
+    pub(crate) fn proposing_to(&self) -> &usize {
         &self.proposing_to
     }
 
-    fn proposing_to_mutable(&mut self) -> &mut i32 {
+    fn proposing_to_mutable(&mut self) -> &mut usize {
         &mut self.proposing_to
     }
 
-    fn preference(&self) -> &Vec<i32> {
+    fn preference(&self) -> &Vec<usize> {
         &self.preference
     }
 }
