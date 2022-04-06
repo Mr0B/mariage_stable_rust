@@ -5,3 +5,4 @@ pub mod woman;
 pub mod result;
 pub mod algo;
 pub mod preference_generator;
+pub mod algorithm;

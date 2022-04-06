@@ -10,18 +10,20 @@ use crate::object::man::*;
 use crate::object::result::*;
 use crate::object::test_instances::*;
 use crate::object::woman::*;
-use crate::object::{man, result, test_instances, woman};
+use crate::object::{algo, man, result, test_instances, woman};
 use rand::prelude::SliceRandom;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 use std::borrow::Borrow;
 use std::collections::HashMap;
+use std::convert::TryInto;
 use std::ops::Deref;
 use std::ptr::null;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
+use crate::object::algorithm::{Algorithm, SequentialAlgorithm};
 use crate::object::preference_generator::PreferenceGenerator;
 
 fn main() {
@@ -32,35 +34,25 @@ fn main() {
     let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
     let deck_parallel = deck.clone();
     let women_parallel = women.clone();
-    //let now = Instant::now();
     let result_sequential = marriage_stable_sequential(deck, women);
-    //println!("{}", now.elapsed().as_micros());
-    //let now_2 = Instant::now();
     let result_parallel = marriage_stable_parallel(deck_parallel, women_parallel);
-    //println!("{}", now_2.elapsed().as_micros());
     print_couples(result_sequential.paired_women());
     print_couples(result_parallel.paired_women());
 }
 
-// fn resolve(algo: Algo, size_instance: i32) -> Resultant {
-//     let mut deck: Storage<Man> = Deck::new();
-//     init_men(&mut deck, size_instance);
-//     let women: Vec<Woman> = init_woman(size_instance);
-//     match algo {
-//         Sequential => {
-//             let now = Instant::now();
-//             let result_sequential = marriage_stable_sequential(deck, women);
-//             Resultant::new(result_sequential, algo, now.elapsed().as_micros())
-//         }
-//         Parallel => {
-//             let now = Instant::now();
-//             let result_parallel = marriage_stable_parallel(deck, women);
-//             Resultant::new(result_parallel, algo, now.elapsed().as_micros())
-//         }
-//     }
-// }
+fn mariage_stable(algo: Algo) -> Resultant{
+    let size_of_list: usize = 5;
+    let mut random_generator = PreferenceGenerator::new(27);
+    let mut deck: Storage<Man> = Deck::new();
+    init_men(&mut deck, size_of_list, &mut random_generator);
+    let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
+    match algo {
+        Sequential => {SequentialAlgorithm::resolve(&self, deck, women)}
+        Parallel => {}
+    }
+}
 
-fn marriage_stable_sequential(mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
+/*fn marriage_stable_sequential(mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
     while let Some(mut man_proposing) = deck.pop() {
         if let Some(target) = man_proposing.find_next_woman() {
             let woman_being_proposed_to: &mut Woman = &mut women[(*target) - 1];
@@ -106,7 +98,7 @@ fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) -> Resultant 
     }
     let instance = Arc::try_unwrap(instance).ok().unwrap();
     Resultant::new(mutex_women_to_women(instance.list_woman), Parallel)
-}
+}*/
 
 fn init_men(deck: &mut Storage<Man>, number: usize, random_generator: &mut PreferenceGenerator) {
     for i in 1..(number + 1) {
@@ -139,15 +131,6 @@ fn mutex_women_to_women(mutex_women: Vec<Mutex<Woman>>) -> Vec<Woman> {
     }
     women
 }
-
-/*fn generate_preference(size: usize) -> Vec<usize> {
-    let mut my_vector: Vec<usize> = (1..size + 1).map(|x| x).collect();
-    let mut rng = rand::thread_rng();
-    //let mut test = StdRng::seed_from_u64(28);
-    my_vector.shuffle(&mut rng);
-    //my_vector.shuffle(&mut test);
-    my_vector
-}*/
 
 fn print_couples(women: &Vec<Woman>) {
     let mut i = 0;
