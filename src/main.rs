@@ -23,20 +23,15 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
-use crate::object::algorithm::{Algorithm, SequentialAlgorithm};
+use crate::object::algorithm::{Algorithm, ParallelAlgorithm, SequentialAlgorithm};
 use crate::object::preference_generator::PreferenceGenerator;
 
 fn main() {
-    let size_of_list: usize = 5;
-    let mut random_generator = PreferenceGenerator::new(27);
-    let mut deck: Storage<Man> = Deck::new();
-    init_men(&mut deck, size_of_list, &mut random_generator);
-    let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
-    let deck_parallel = deck.clone();
-    let women_parallel = women.clone();
-    let result_sequential = marriage_stable_sequential(deck, women);
-    let result_parallel = marriage_stable_parallel(deck_parallel, women_parallel);
+    let result_sequential = mariage_stable(Sequential);
+    let result_parallel = mariage_stable(Parallel(16));
+    print_algo_type_and_duration(&result_sequential);
     print_couples(result_sequential.paired_women());
+    print_algo_type_and_duration(&result_parallel);
     print_couples(result_parallel.paired_women());
 }
 
@@ -47,8 +42,8 @@ fn mariage_stable(algo: Algo) -> Resultant{
     init_men(&mut deck, size_of_list, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
     match algo {
-        Sequential => {SequentialAlgorithm::resolve(&self, deck, women)}
-        Parallel => {}
+        Sequential => {SequentialAlgorithm::new().resolve(deck, women)}
+        Parallel(number_thread) => {ParallelAlgorithm::new(number_thread).resolve(deck, women)}
     }
 }
 
@@ -132,6 +127,10 @@ fn mutex_women_to_women(mutex_women: Vec<Mutex<Woman>>) -> Vec<Woman> {
     women
 }
 
+fn print_algo_type_and_duration(result: &Resultant) {
+    println!("The {:?} algorithm took {}", result.algo(), result.time());
+}
+
 fn print_couples(women: &Vec<Woman>) {
     let mut i = 0;
     println!("|          | Woman | preference_woman | Man | preference_man  |");
@@ -140,6 +139,7 @@ fn print_couples(women: &Vec<Woman>) {
         let man_of_woman = woman.favorite();
         match man_of_woman {
             None => {
+                println!("{:?}", woman.preference);
                 println!("daf is happening")
             }
             Some(man) => {

@@ -29,6 +29,9 @@ impl Woman {
                 })
             {
                 return if position_favorite > position_pretending {
+                    println!("Sachant que ma liste de préférence est: {:?}", self.preference);
+                    println!("Ceci est la position du prétendant {}", position_pretending);
+                    println!("Ceci est la position du fiancé {}", position_favorite);
                     let former_favorite = self.favorite().to_owned();
                     *self.favorite_mutable() = Some(pretending);
                     former_favorite

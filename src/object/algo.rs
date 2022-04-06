@@ -1,4 +1,5 @@
+#[derive(Debug)]
 pub(crate) enum Algo {
     Sequential,
-    Parallel,
+    Parallel(i32),
 }

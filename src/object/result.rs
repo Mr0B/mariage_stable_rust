@@ -19,4 +19,12 @@ impl Resultant {
     pub(crate) fn paired_women(&self) -> &Vec<Woman> {
         &self.paired_women
     }
+
+    pub(crate) fn algo(&self) -> &Algo {
+        &self.algo
+    }
+
+    pub(crate) fn time(&self) -> &u128 {
+        &self.time
+    }
 }
