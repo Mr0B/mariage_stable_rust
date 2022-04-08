@@ -28,7 +28,7 @@ use std::time::Instant;
 
 fn main() {
     let result_sequential = marriage_stable(Sequential);
-    let result_parallel = marriage_stable(Parallel(8));
+    let result_parallel = marriage_stable(Parallel(16));
     println!(
         "{}",
         check_result(
