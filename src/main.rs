@@ -43,14 +43,18 @@ fn main() {
 }
 
 fn marriage_stable(algo: Algo) -> Resultant {
-    let size_of_list: usize = 10;
+    let size_of_list: usize = 3;
     let mut random_generator = PreferenceGenerator::new(27);
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_of_list, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
+    solve(algo, deck, women)
+}
+
+fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>) -> Resultant {
     match algo {
-        Sequential => SequentialAlgorithm::new().resolve(deck, women),
-        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(deck, women),
+        Sequential => SequentialAlgorithm::new().resolve(men, women),
+        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(men, women),
     }
 }
 

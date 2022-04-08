@@ -22,8 +22,8 @@ impl Woman {
                 self.favorite = Some(pretending);
                 None
             }
-            Some(favori) => {
-                if self.prefer_man(&pretending, &favori) {
+            Some(favorite) => {
+                if self.prefer_man(&pretending, &favorite) {
                     let former_favorite = self.favorite.take();
                     self.favorite = Some(pretending);
                     former_favorite
@@ -44,6 +44,6 @@ impl Woman {
 
     pub(crate) fn prefer_man(&self, man1: &Man, man2: &Man) -> bool {
         self.preference.iter().position(|&r| r == man1.name)
-            > self.preference.iter().position(|&r| r == man2.name)
+            < self.preference.iter().position(|&r| r == man2.name)
     }
 }
