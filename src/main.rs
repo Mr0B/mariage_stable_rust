@@ -5,8 +5,10 @@ mod test_thread;
 
 use crate::object::algo::Algo;
 use crate::object::algo::Algo::{Parallel, Sequential};
+use crate::object::algorithm::{Algorithm, ParallelAlgorithm, SequentialAlgorithm};
 use crate::object::deck::*;
 use crate::object::man::*;
+use crate::object::preference_generator::PreferenceGenerator;
 use crate::object::result::*;
 use crate::object::test_instances::*;
 use crate::object::woman::*;
@@ -23,80 +25,37 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
-use crate::object::algorithm::{Algorithm, ParallelAlgorithm, SequentialAlgorithm};
-use crate::object::preference_generator::PreferenceGenerator;
 
 fn main() {
-    let result_sequential = mariage_stable(Sequential);
-    let result_parallel = mariage_stable(Parallel(16));
+    let result_sequential = marriage_stable(Sequential);
+    let result_parallel = marriage_stable(Parallel(8));
+    println!(
+        "{}",
+        check_result(
+            result_sequential.paired_women(),
+            result_parallel.paired_women()
+        )
+    );
     print_algo_type_and_duration(&result_sequential);
     print_couples(result_sequential.paired_women());
     print_algo_type_and_duration(&result_parallel);
     print_couples(result_parallel.paired_women());
 }
 
-fn mariage_stable(algo: Algo) -> Resultant{
-    let size_of_list: usize = 5;
+fn marriage_stable(algo: Algo) -> Resultant {
+    let size_of_list: usize = 10;
     let mut random_generator = PreferenceGenerator::new(27);
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_of_list, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
     match algo {
-        Sequential => {SequentialAlgorithm::new().resolve(deck, women)}
-        Parallel(number_thread) => {ParallelAlgorithm::new(number_thread).resolve(deck, women)}
+        Sequential => SequentialAlgorithm::new().resolve(deck, women),
+        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(deck, women),
     }
 }
-
-/*fn marriage_stable_sequential(mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
-    while let Some(mut man_proposing) = deck.pop() {
-        if let Some(target) = man_proposing.find_next_woman() {
-            let woman_being_proposed_to: &mut Woman = &mut women[(*target) - 1];
-            if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
-                deck.add(dropped_man);
-            }
-        }
-    }
-    Resultant::new(women, Sequential)
-}
-
-fn marriage_stable_parallel(deck: Storage<Man>, women: Vec<Woman>) -> Resultant {
-    let instance = init_instance(deck, women);
-    let mut handles: Vec<JoinHandle<()>> = vec![];
-    for _i in 0..8 {
-        let instance = Arc::clone(&instance);
-        let handle = thread::spawn(move || {
-            //let mut compteur = 0;
-            loop {
-                //compteur += 1;
-                let variable = instance.list_man.lock().unwrap().pop();
-                match variable {
-                    None => {
-                        //println!("thread numéro: {} a un compteur {}", i, compteur);
-                        break;
-                    }
-                    Some(mut man) => {
-                        if let Some(target) = man.find_next_woman() {
-                            let mut woman_proposed_to =
-                                instance.list_woman[(*target) - 1].lock().unwrap();
-                            if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
-                                instance.list_man.lock().unwrap().add(dropped_man);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        handles.push(handle);
-    }
-    for handle in handles {
-        handle.join().unwrap();
-    }
-    let instance = Arc::try_unwrap(instance).ok().unwrap();
-    Resultant::new(mutex_women_to_women(instance.list_woman), Parallel)
-}*/
 
 fn init_men(deck: &mut Storage<Man>, number: usize, random_generator: &mut PreferenceGenerator) {
-    for i in 1..(number + 1) {
+    for i in 0..number {
         let man_holder = man::Man::new(i, random_generator.generate_preference(number), 0);
         deck.add(man_holder);
     }
@@ -104,7 +63,7 @@ fn init_men(deck: &mut Storage<Man>, number: usize, random_generator: &mut Prefe
 
 fn init_woman(number: usize, random_generator: &mut PreferenceGenerator) -> Vec<Woman> {
     let mut women = vec![];
-    for i in 1..(number + 1) {
+    for i in 0..number {
         let woman_holder = woman::Woman::new(i, random_generator.generate_preference(number), None);
         women.push(woman_holder);
     }
@@ -160,4 +119,13 @@ fn print_couples(women: &Vec<Woman>) {
             }
         }
     }
+}
+
+fn check_result(women_sequential: &Vec<Woman>, women_parallel: &Vec<Woman>) -> bool {
+    for i in 0..women_sequential.len() {
+        if women_sequential[i].name != women_parallel[i].name {
+            return false;
+        }
+    }
+    true
 }

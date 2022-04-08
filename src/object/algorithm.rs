@@ -26,17 +26,9 @@ impl Algorithm for SequentialAlgorithm {
     fn resolve(&self, mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
         let now = Instant::now();
         while let Some(mut man_proposing) = deck.pop() {
-            println!("a");
-            println!("{}", man_proposing.name);
-            println!("{:?}", man_proposing.preference);
             if let Some(target) = man_proposing.find_next_woman() {
-                let woman_being_proposed_to: &mut Woman = &mut women[(*target)-1];
-                println!("Je propose à la {} femme de ma liste ci-dessus", target-1);
-                println!("Qui se trouve s'appeler {}", woman_being_proposed_to.name);
+                let woman_being_proposed_to: &mut Woman = &mut women[(*target)];
                 if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
-                    println!("b");
-                    println!("{}", dropped_man.name);
-                    println!("{:?}", dropped_man.preference);
                     deck.add(dropped_man);
                 }
             }
@@ -68,7 +60,7 @@ impl Algorithm for ParallelAlgorithm {
                     Some(mut man) => {
                         if let Some(target) = man.find_next_woman() {
                             let mut woman_proposed_to =
-                                instance.list_woman[(*target) - 1].lock().unwrap();
+                                instance.list_woman[(*target)].lock().unwrap();
                             if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
                                 instance.list_man.lock().unwrap().add(dropped_man);
                             }

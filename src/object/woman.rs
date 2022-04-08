@@ -17,33 +17,20 @@ impl Woman {
     }
 
     pub(crate) fn check_favorite(&mut self, pretending: Man) -> Option<Man> {
-        if let Some(position_pretending) =
-            self.preference.iter().position(|&r| r == pretending.name)
-        {
-            if let Some(position_favorite) = self
-                .preference
-                .iter()
-                .position(|&r| r == match &self.favorite {
-                    None => {usize::MAX}
-                    Some(man) => {man.name}
-                })
-            {
-                return if position_favorite > position_pretending {
-                    println!("Sachant que ma liste de préférence est: {:?}", self.preference);
-                    println!("Ceci est la position du prétendant {}", position_pretending);
-                    println!("Ceci est la position du fiancé {}", position_favorite);
-                    let former_favorite = self.favorite().to_owned();
-                    *self.favorite_mutable() = Some(pretending);
+        match &self.favorite {
+            None => {
+                self.favorite = Some(pretending);
+                None
+            }
+            Some(favori) => {
+                if self.prefer_man(&pretending, &favori) {
+                    let former_favorite = self.favorite.take();
+                    self.favorite = Some(pretending);
                     former_favorite
                 } else {
                     Some(pretending)
-                };
-            } else {
-                *self.favorite_mutable() = Some(pretending);
-                None
+                }
             }
-        } else {
-            panic!("This should never ever happen")
         }
     }
 
@@ -53,5 +40,10 @@ impl Woman {
 
     pub(crate) fn favorite_mutable(&mut self) -> &mut Option<Man> {
         &mut self.favorite
+    }
+
+    pub(crate) fn prefer_man(&self, man1: &Man, man2: &Man) -> bool {
+        self.preference.iter().position(|&r| r == man1.name)
+            > self.preference.iter().position(|&r| r == man2.name)
     }
 }
