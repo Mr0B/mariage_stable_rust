@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(dead_code)]
 mod object;
 mod test;
 mod test_thread;
@@ -19,16 +20,31 @@ use rand::SeedableRng;
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::convert::TryInto;
+use std::env::args;
 use std::ops::Deref;
 use std::ptr::null;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
+use clap::Parser;
+use clap::*;
+
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+pub(crate) struct Args{
+    #[clap(short, long)]
+    instance_size: usize,
+    #[clap(short, long)]
+    seed: u64,
+}
 
 fn main() {
-    let result_sequential = marriage_stable(Sequential);
-    let result_parallel = marriage_stable(Parallel(16));
+    let args = Args::parse();
+    let size_instance = args.instance_size;
+    let seed = args.seed;
+    let result_sequential = marriage_stable(Sequential, size_instance, seed);
+    let result_parallel = marriage_stable(Parallel(16), size_instance, seed);
     println!(
         "{}",
         check_result(
@@ -42,12 +58,11 @@ fn main() {
     print_couples(result_parallel.paired_women());
 }
 
-fn marriage_stable(algo: Algo) -> Resultant {
-    let size_of_list: usize = 3;
-    let mut random_generator = PreferenceGenerator::new(27);
+fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
+    let mut random_generator = PreferenceGenerator::new(seed);
     let mut deck: Storage<Man> = Deck::new();
-    init_men(&mut deck, size_of_list, &mut random_generator);
-    let women: Vec<Woman> = init_woman(size_of_list, &mut random_generator);
+    init_men(&mut deck, size_instance, &mut random_generator);
+    let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
     solve(algo, deck, women)
 }
 
