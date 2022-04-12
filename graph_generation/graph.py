@@ -1,6 +1,5 @@
 import os
 
-
 import matplotlib.pyplot as plt
 
 
@@ -11,25 +10,24 @@ def extract_value():
     list1 = []
     storage = (0, 0)
     for line in file_object:
-        print(storage)
+        i += 1
         list2 = line.split("/")
         if i % 2 == 0:
+            time = int(list2[2])
+            list1.append((storage[0], storage[1] / time))
+        else:
             size = int(list2[0])
             time = int(list2[2])
             storage = (size, time)
-        else:
-            time = int(list2[2])
-            list1.append((storage[0], time / storage[1]))
-        i += 1
     return list1
 
 
 def basic_plot(list1):
     plt.close('all')
     x = [i[0] for i in list1]
-    print(x)
     y = [i[1] for i in list1]
-    print(y)
+    plt.ylabel("Speed_Up")  # y label
+    plt.xlabel("Size_Instance")  # x label
     plt.grid()
     plt.plot(x, y)
     plt.show()
