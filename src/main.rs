@@ -14,6 +14,8 @@ use crate::object::result::*;
 use crate::object::test_instances::*;
 use crate::object::woman::*;
 use crate::object::{algo, man, result, test_instances, woman};
+use clap::Parser;
+use clap::*;
 use rand::prelude::SliceRandom;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
@@ -21,18 +23,18 @@ use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::env::args;
+use std::fs::{File, OpenOptions};
+use std::io::{Error, Write};
 use std::ops::Deref;
-use std::ptr::null;
+use std::ptr::{null, write};
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Instant;
-use clap::Parser;
-use clap::*;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
-pub(crate) struct Args{
+pub(crate) struct Args {
     #[clap(short, long)]
     instance_size: usize,
     #[clap(short, long)]
@@ -52,10 +54,12 @@ fn main() {
             result_parallel.paired_women()
         )
     );
-    print_algo_type_and_duration(&result_sequential);
-    print_couples(result_sequential.paired_women());
-    print_algo_type_and_duration(&result_parallel);
-    print_couples(result_parallel.paired_women());
+    //print_algo_type_and_duration(&result_sequential);
+    log_result(&result_sequential).expect("");
+    //print_couples(result_sequential.paired_women());
+    //print_algo_type_and_duration(&result_parallel);
+    log_result(&result_parallel).expect("");
+    //print_couples(result_parallel.paired_women());
 }
 
 fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
@@ -107,6 +111,23 @@ fn mutex_women_to_women(mutex_women: Vec<Mutex<Woman>>) -> Vec<Woman> {
 
 fn print_algo_type_and_duration(result: &Resultant) {
     println!("The {:?} algorithm took {}", result.algo(), result.time());
+}
+
+fn log_result(result: &Resultant) -> std::io::Result<()> {
+    let buffer = format!(
+        "{}/{:?}/{}/\n",
+        result.paired_women().len(),
+        result.algo(),
+        result.time()
+    );
+    let path = "graph_generation/log.txt";
+    if std::path::Path::new(path).exists() {
+        let mut output = OpenOptions::new().append(true).open(path)?;
+        output.write_all(buffer.as_bytes())
+    } else {
+        let mut output = File::create(path)?;
+        output.write_all(buffer.as_bytes())
+    }
 }
 
 fn print_couples(women: &Vec<Woman>) {

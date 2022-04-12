@@ -1,0 +1,4 @@
+100/Sequential/1783/
+100/Parallel(16)/1816/
+200/Sequential/9993/
+200/Parallel(16)/7292/
