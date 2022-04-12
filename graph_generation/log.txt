@@ -2,3 +2,11 @@
 100/Parallel(16)/1816/
 200/Sequential/9993/
 200/Parallel(16)/7292/
+300/Sequential/15689/
+300/Parallel(16)/10042/
+400/Sequential/24460/
+400/Parallel(16)/15933/
+500/Sequential/50250/
+500/Parallel(16)/29557/
+600/Sequential/79165/
+600/Parallel(16)/47227/

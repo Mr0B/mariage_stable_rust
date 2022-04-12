@@ -1,6 +1,9 @@
 import os
 
 
+import matplotlib.pyplot as plt
+
+
 def extract_value():
     path = os.path.abspath("graph_generation/log.txt")
     file_object = open(path, "r")
@@ -21,6 +24,17 @@ def extract_value():
     return list1
 
 
+def basic_plot(list1):
+    plt.close('all')
+    x = [i[0] for i in list1]
+    print(x)
+    y = [i[1] for i in list1]
+    print(y)
+    plt.grid()
+    plt.plot(x, y)
+    plt.show()
+
+
 if __name__ == '__main__':
     list_size_speedup = extract_value()
-    print(list_size_speedup)
+    basic_plot(list_size_speedup)
