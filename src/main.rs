@@ -35,31 +35,28 @@ use std::time::Instant;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 pub(crate) struct Args {
+    #[clap(long)]
+    instance_size_start: usize,
+    #[clap(long)]
+    instance_size_end: usize,
     #[clap(short, long)]
-    instance_size: usize,
+    pas: usize,
     #[clap(short, long)]
     seed: u64,
 }
 
 fn main() {
     let args = Args::parse();
-    let size_instance = args.instance_size;
+    let size_instance_start = args.instance_size_start;
+    let size_instance_end = args.instance_size_end;
+    let pas = args.pas;
     let seed = args.seed;
-    let result_sequential = marriage_stable(Sequential, size_instance, seed);
-    let result_parallel = marriage_stable(Parallel(16), size_instance, seed);
-    println!(
-        "{}",
-        check_result(
-            result_sequential.paired_women(),
-            result_parallel.paired_women()
-        )
-    );
-    //print_algo_type_and_duration(&result_sequential);
-    log_result(&result_sequential).expect("");
-    //print_couples(result_sequential.paired_women());
-    //print_algo_type_and_duration(&result_parallel);
-    log_result(&result_parallel).expect("");
-    //print_couples(result_parallel.paired_women());
+    for i in (size_instance_start..size_instance_end).step_by(pas)  {
+        let result_sequential = marriage_stable(Sequential, i, seed);
+        let result_parallel = marriage_stable(Parallel(4), i, seed);
+        log_result(&result_sequential).expect("");
+        log_result(&result_parallel).expect("");
+    }
 }
 
 fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {

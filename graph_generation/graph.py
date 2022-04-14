@@ -1,4 +1,6 @@
+import datetime
 import os
+import subprocess
 
 import matplotlib.pyplot as plt
 
@@ -19,10 +21,11 @@ def extract_value():
             size = int(list2[0])
             time = int(list2[2])
             storage = (size, time)
+    file_object.close()
     return list1
 
 
-def basic_plot(list1):
+def basic_plot(list1, title):
     plt.close('all')
     x = [i[0] for i in list1]
     y = [i[1] for i in list1]
@@ -30,9 +33,12 @@ def basic_plot(list1):
     plt.xlabel("Size_Instance")  # x label
     plt.grid()
     plt.plot(x, y)
-    plt.show()
+    plt.title(title)
+    plt.savefig(f'graph_generation/{datetime.datetime.now()}.png')
 
 
 if __name__ == '__main__':
+    command = 'cargo run -- --instance-size-start 100 --instance-size-end 1000 -p 25 -s 42'
+    subprocess.run(command, shell=True)
     list_size_speedup = extract_value()
-    basic_plot(list_size_speedup)
+    basic_plot(list_size_speedup, command)

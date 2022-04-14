@@ -34,7 +34,7 @@ impl Algorithm for SequentialAlgorithm {
             }
         }
         let elapsed_time = now.elapsed();
-        Resultant::new(women, Sequential, elapsed_time.as_micros())
+        Resultant::new(women, Sequential, elapsed_time.as_nanos())
     }
 }
 
@@ -78,7 +78,7 @@ impl Algorithm for ParallelAlgorithm {
         Resultant::new(
             mutex_women_to_women(instance.list_woman),
             Parallel(self.number_thread),
-            elapsed_time.as_micros(),
+            elapsed_time.as_nanos(),
         )
     }
 }
