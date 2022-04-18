@@ -24,7 +24,5 @@ impl Resultant {
         &self.algo
     }
 
-    pub(crate) fn time(&self) -> &u128 {
-        &self.time
-    }
+    pub(crate) fn time(&self) -> &u128 { &self.time}
 }

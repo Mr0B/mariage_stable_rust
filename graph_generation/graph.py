@@ -34,11 +34,11 @@ def basic_plot(list1, title):
     plt.grid()
     plt.plot(x, y)
     plt.title(title)
-    plt.savefig(f'graph_generation/{datetime.datetime.now()}.png')
+    plt.savefig(f'graph_generation/Graphs/{datetime.datetime.now()}.png')
 
 
 if __name__ == '__main__':
-    command = 'cargo run -- --instance-size-start 100 --instance-size-end 1000 -p 25 -s 42'
+    command = 'cargo run -- -s 42 --instance-size-start 100 --instance-size-end 1000 -p 25 -n 10'
     subprocess.run(command, shell=True)
     list_size_speedup = extract_value()
     basic_plot(list_size_speedup, command)

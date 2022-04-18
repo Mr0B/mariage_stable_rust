@@ -35,42 +35,48 @@ use std::time::Instant;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 pub(crate) struct Args {
+    #[clap(short, long)]
+    seed: u64,
     #[clap(long)]
     instance_size_start: usize,
     #[clap(long)]
     instance_size_end: usize,
     #[clap(short, long)]
     pas: usize,
+    #[clap(short, long, default_value_t = 2)]
+    thread_number: i32,
     #[clap(short, long)]
-    seed: u64,
+    nombre_repetition: u128,
 }
 
 fn main() {
     let args = Args::parse();
+    let seed = args.seed;
     let size_instance_start = args.instance_size_start;
     let size_instance_end = args.instance_size_end;
     let pas = args.pas;
-    let seed = args.seed;
+    let thread_number = args.thread_number;
+    let nombre_repetition = args.nombre_repetition;
     for i in (size_instance_start..size_instance_end).step_by(pas)  {
-        let result_sequential = marriage_stable(Sequential, i, seed);
-        let result_parallel = marriage_stable(Parallel(4), i, seed);
+        let result_sequential = marriage_stable(Sequential, i, seed, nombre_repetition);
+        let result_parallel = marriage_stable(Parallel(thread_number), i, seed, nombre_repetition);
         log_result(&result_sequential).expect("");
         log_result(&result_parallel).expect("");
     }
 }
 
-fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
+fn marriage_stable(algo: Algo, size_instance: usize, seed: u64, nombre_repetition: u128) -> Resultant {
     let mut random_generator = PreferenceGenerator::new(seed);
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_instance, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
-    solve(algo, deck, women)
+    solve(algo, deck, women, nombre_repetition)
 }
 
-fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>) -> Resultant {
+fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>, nombre_repetition: u128) -> Resultant {
     match algo {
-        Sequential => SequentialAlgorithm::new().resolve(men, women),
-        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(men, women),
+        Sequential => SequentialAlgorithm::new().resolve(men, women, nombre_repetition),
+        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(men, women, nombre_repetition),
     }
 }
 
