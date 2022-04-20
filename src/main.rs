@@ -57,7 +57,7 @@ fn main() {
     let pas = args.pas;
     let thread_number = args.thread_number;
     let nombre_repetition = args.nombre_repetition;
-    for i in (size_instance_start..size_instance_end).step_by(pas)  {
+    for i in (size_instance_start..(size_instance_end + pas)).step_by(pas) {
         for _ in 0..nombre_repetition {
             let result_sequential = marriage_stable(Sequential, i, seed);
             let result_parallel = marriage_stable(Parallel(thread_number), i, seed);

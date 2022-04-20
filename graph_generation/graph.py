@@ -51,8 +51,9 @@ def basic_plot(list1, title):
 
 
 if __name__ == '__main__':
-    command = 'cargo run -- -s 42 --instance-size-start 100 --instance-size-end 1000 -p 25 -t 4 -n 10'
+    command = 'cargo run -- -s 42 --instance-size-start 100 --instance-size-end 1000 -p 25 -t 4 -n 50'
     subprocess.run(command, shell=True)
     list_size_speedup = extract_value()
     better_list = moyenne(list_size_speedup)
     basic_plot(better_list, command)
+    subprocess.run('rm graph_generation/log.txt')
