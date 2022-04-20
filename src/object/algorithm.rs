@@ -13,7 +13,7 @@ pub(crate) struct ParallelAlgorithm {
 }
 
 pub(crate) trait Algorithm {
-    fn resolve(&self, _: Storage<Man>, _: Vec<Woman>, _: u128) -> Resultant;
+    fn resolve(&self, _: Storage<Man>, _: Vec<Woman>) -> Resultant;
 }
 
 impl SequentialAlgorithm {
@@ -23,31 +23,18 @@ impl SequentialAlgorithm {
 }
 
 impl Algorithm for SequentialAlgorithm {
-    fn resolve(
-        &self,
-        mut deck: Storage<Man>,
-        mut women: Vec<Woman>,
-        nombre_repetition: u128,
-    ) -> Resultant {
-        let mut times = vec![];
-        for _ in 0..nombre_repetition {
-            let now = Instant::now();
-            while let Some(mut man_proposing) = deck.pop() {
-                if let Some(target) = man_proposing.find_next_woman() {
-                    let woman_being_proposed_to: &mut Woman = &mut women[(*target)];
-                    if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing)
-                    {
-                        deck.add(dropped_man);
-                    }
+    fn resolve(&self, mut deck: Storage<Man>, mut women: Vec<Woman>) -> Resultant {
+        let now = Instant::now();
+        while let Some(mut man_proposing) = deck.pop() {
+            if let Some(target) = man_proposing.find_next_woman() {
+                let woman_being_proposed_to: &mut Woman = &mut women[(*target)];
+                if let Some(dropped_man) = woman_being_proposed_to.check_favorite(man_proposing) {
+                    deck.add(dropped_man);
                 }
             }
-            times.push(now.elapsed().as_nanos());
         }
-        Resultant::new(
-            women,
-            Sequential,
-            (times.iter().sum::<u128>()) / nombre_repetition,
-        )
+        let time = now.elapsed().as_nanos();
+        Resultant::new(women, Sequential, time)
     }
 }
 
@@ -58,43 +45,40 @@ impl ParallelAlgorithm {
 }
 
 impl Algorithm for ParallelAlgorithm {
-    fn resolve(&self, deck: Storage<Man>, women: Vec<Woman>, nombre_repetition: u128) -> Resultant {
-        let mut times = vec![];
+    fn resolve(&self, deck: Storage<Man>, women: Vec<Woman>) -> Resultant {
         let instance = init_instance(deck, women);
-        for _ in 0..nombre_repetition {
-            let mut handles: Vec<JoinHandle<()>> = vec![];
-            let now = Instant::now();
-            for _ in 0..self.number_thread {
-                let instance = Arc::clone(&instance);
-                let handle = thread::spawn(move || loop {
-                    let variable = instance.list_man.lock().unwrap().pop();
-                    match variable {
-                        None => {
-                            break;
-                        }
-                        Some(mut man) => {
-                            if let Some(target) = man.find_next_woman() {
-                                let mut woman_proposed_to =
-                                    instance.list_woman[(*target)].lock().unwrap();
-                                if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
-                                    instance.list_man.lock().unwrap().add(dropped_man);
-                                }
+        let mut handles: Vec<JoinHandle<()>> = vec![];
+        let now = Instant::now();
+        for _ in 0..self.number_thread {
+            let instance = Arc::clone(&instance);
+            let handle = thread::spawn(move || loop {
+                let variable = instance.list_man.lock().unwrap().pop();
+                match variable {
+                    None => {
+                        break;
+                    }
+                    Some(mut man) => {
+                        if let Some(target) = man.find_next_woman() {
+                            let mut woman_proposed_to =
+                                instance.list_woman[(*target)].lock().unwrap();
+                            if let Some(dropped_man) = woman_proposed_to.check_favorite(man) {
+                                instance.list_man.lock().unwrap().add(dropped_man);
                             }
                         }
                     }
-                });
-                handles.push(handle);
-            }
-            for handle in handles {
-                handle.join().unwrap();
-            }
-            times.push(now.elapsed().as_nanos());
+                }
+            });
+            handles.push(handle);
         }
+        for handle in handles {
+            handle.join().unwrap();
+        }
+        let time = now.elapsed().as_nanos();
         let instance = Arc::try_unwrap(instance).ok().unwrap();
         Resultant::new(
             mutex_women_to_women(instance.list_woman),
             Parallel(self.number_thread),
-            (times.iter().sum::<u128>()) / nombre_repetition,
+            time,
         )
     }
 }

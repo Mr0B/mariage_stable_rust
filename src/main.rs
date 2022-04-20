@@ -58,25 +58,30 @@ fn main() {
     let thread_number = args.thread_number;
     let nombre_repetition = args.nombre_repetition;
     for i in (size_instance_start..size_instance_end).step_by(pas)  {
-        let result_sequential = marriage_stable(Sequential, i, seed, nombre_repetition);
-        let result_parallel = marriage_stable(Parallel(thread_number), i, seed, nombre_repetition);
-        log_result(&result_sequential).expect("");
-        log_result(&result_parallel).expect("");
+        for _ in 0..nombre_repetition {
+            let result_sequential = marriage_stable(Sequential, i, seed);
+            let result_parallel = marriage_stable(Parallel(thread_number), i, seed);
+            log_result(&result_sequential).expect("");
+            log_result(&result_parallel).expect("");
+        }
     }
 }
 
-fn marriage_stable(algo: Algo, size_instance: usize, seed: u64, nombre_repetition: u128) -> Resultant {
+fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
     let mut random_generator = PreferenceGenerator::new(seed);
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_instance, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
-    solve(algo, deck, women, nombre_repetition)
+    //let mut test = deck.clone();
+    //let mut test2= women.clone();
+    //Clone les instances avant
+    solve(algo, deck, women)
 }
 
-fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>, nombre_repetition: u128) -> Resultant {
+fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>) -> Resultant {
     match algo {
-        Sequential => SequentialAlgorithm::new().resolve(men, women, nombre_repetition),
-        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(men, women, nombre_repetition),
+        Sequential => SequentialAlgorithm::new().resolve(men, women),
+        Parallel(number_thread) => ParallelAlgorithm::new(number_thread).resolve(men, women),
     }
 }
 

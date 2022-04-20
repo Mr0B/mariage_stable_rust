@@ -25,6 +25,19 @@ def extract_value():
     return list1
 
 
+def moyenne(list_tuple):
+    list_moyenne = []
+    holder = []
+    for x in range(0, len(list_tuple)):
+        if x != len(list_tuple)-1 and list_tuple[x][0] == list_tuple[x + 1][0]:
+            holder.append(list_tuple[x][1])
+        else:
+            holder.append(list_tuple[x][1])
+            list_moyenne.append((list_tuple[x][0], sum(holder) / len(holder)))
+            holder.clear()
+    return list_moyenne
+
+
 def basic_plot(list1, title):
     plt.close('all')
     x = [i[0] for i in list1]
@@ -38,7 +51,8 @@ def basic_plot(list1, title):
 
 
 if __name__ == '__main__':
-    command = 'cargo run -- -s 42 --instance-size-start 100 --instance-size-end 1000 -p 25 -n 10'
+    command = 'cargo run -- -s 42 --instance-size-start 100 --instance-size-end 1000 -p 25 -t 4 -n 10'
     subprocess.run(command, shell=True)
     list_size_speedup = extract_value()
-    basic_plot(list_size_speedup, command)
+    better_list = moyenne(list_size_speedup)
+    basic_plot(better_list, command)
