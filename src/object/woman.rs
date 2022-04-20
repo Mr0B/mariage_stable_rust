@@ -2,13 +2,13 @@ use crate::object::man::Man;
 
 #[derive(Clone)]
 pub struct Woman {
-    pub name: i32,
-    pub preference: Vec<i32>,
-    favorite: Man,
+    pub name: usize,
+    pub preference: Vec<usize>,
+    favorite: Option<Man>,
 }
 
 impl Woman {
-    pub(crate) fn new(name: i32, preference: Vec<i32>, favorite: Man) -> Woman {
+    pub(crate) fn new(name: usize, preference: Vec<usize>, favorite: Option<Man>) -> Woman {
         Woman {
             name,
             preference,
@@ -17,35 +17,33 @@ impl Woman {
     }
 
     pub(crate) fn check_favorite(&mut self, pretending: Man) -> Option<Man> {
-        if let Some(position_pretending) =
-            self.preference.iter().position(|&r| r == pretending.name)
-        {
-            if let Some(position_favorite) = self
-                .preference
-                .iter()
-                .position(|&r| r == self.favorite.name)
-            {
-                return if position_favorite > position_pretending {
-                    let former_favorite = self.favorite().to_owned();
-                    *self.favorite_mutable() = pretending;
-                    Some(former_favorite)
-                } else {
-                    Some(pretending)
-                };
-            } else {
-                *self.favorite_mutable() = pretending;
+        match &self.favorite {
+            None => {
+                self.favorite = Some(pretending);
                 None
             }
-        } else {
-            panic!("This should never ever happen")
+            Some(favorite) => {
+                if self.prefer_man(&pretending, &favorite) {
+                    let former_favorite = self.favorite.take();
+                    self.favorite = Some(pretending);
+                    former_favorite
+                } else {
+                    Some(pretending)
+                }
+            }
         }
     }
 
-    pub(crate) fn favorite(&self) -> &Man {
+    pub(crate) fn favorite(&self) -> &Option<Man> {
         &self.favorite
     }
 
-    pub(crate) fn favorite_mutable(&mut self) -> &mut Man {
+    pub(crate) fn favorite_mutable(&mut self) -> &mut Option<Man> {
         &mut self.favorite
+    }
+
+    pub(crate) fn prefer_man(&self, man1: &Man, man2: &Man) -> bool {
+        self.preference.iter().position(|&r| r == man1.name)
+            < self.preference.iter().position(|&r| r == man2.name)
     }
 }
