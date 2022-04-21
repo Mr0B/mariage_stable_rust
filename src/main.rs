@@ -63,20 +63,30 @@ fn main() {
                 let mut rng = rand::thread_rng();
                 seed = rng.gen()
             }
-            let result_sequential = marriage_stable(Sequential, i, seed);
-            let result_parallel = marriage_stable(Parallel(thread_number), i, seed);
+            let instance = marriage_stable(i, seed);
+            let (men2, women2) = instance.clone();
+            let result_sequential = solve(Sequential, instance.0, instance.1);
+            let result_parallel = solve(Parallel(thread_number), men2, women2);
             log_result(&result_sequential).expect("");
             log_result(&result_parallel).expect("");
         }
     }
 }
 
-fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
+/*fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
     let mut random_generator = PreferenceGenerator::new(seed);
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_instance, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
     solve(algo, deck, women)
+}*/
+
+fn marriage_stable(size_instance: usize, seed: u64) -> (Storage<Man>, Vec<Woman>) {
+    let mut random_generator = PreferenceGenerator::new(seed);
+    let mut deck: Storage<Man> = Deck::new();
+    init_men(&mut deck, size_instance, &mut random_generator);
+    let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
+    return (deck, women)
 }
 
 fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>) -> Resultant {
