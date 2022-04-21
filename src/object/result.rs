@@ -4,15 +4,15 @@ use crate::Woman;
 pub(crate) struct Resultant {
     paired_women: Vec<Woman>,
     algo: Algo,
-    time: u128
+    time_elapsed: u128,
 }
 
 impl Resultant {
-    pub(crate) fn new(women: Vec<Woman>, algo: Algo , time_elapsed: u128) -> Resultant {
+    pub(crate) fn new(paired_women: Vec<Woman>, algo: Algo , time_elapsed: u128) -> Resultant {
         Resultant {
-            paired_women: women,
+            paired_women,
             algo,
-            time: time_elapsed,
+            time_elapsed
         }
     }
 

@@ -73,14 +73,6 @@ fn main() {
     }
 }
 
-/*fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
-    let mut random_generator = PreferenceGenerator::new(seed);
-    let mut deck: Storage<Man> = Deck::new();
-    init_men(&mut deck, size_instance, &mut random_generator);
-    let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
-    solve(algo, deck, women)
-}*/
-
 fn marriage_stable(size_instance: usize, seed: u64) -> (Storage<Man>, Vec<Woman>) {
     let mut random_generator = PreferenceGenerator::new(seed);
     let mut deck: Storage<Man> = Deck::new();

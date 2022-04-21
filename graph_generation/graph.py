@@ -1,13 +1,13 @@
 import datetime
 import os
-import subprocess
+# import subprocess
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 def extract_value():
-    path = os.path.abspath("graph_generation/log.txt")
+    path = os.path.abspath("graph_generation/10to1000by10with101try.txt")
     file_object = open(path, "r")
     i = 0
     list1 = []
@@ -27,7 +27,7 @@ def extract_value():
 
 
 def parallel_plot():
-    path = os.path.abspath("graph_generation/log.txt")
+    path = os.path.abspath("graph_generation/10to1000by10with101try.txt")
     file_object = open(path, "r")
     list1 = []
     for line in file_object:
@@ -46,26 +46,23 @@ def parallel_plot():
 
 
 def sequential_plot():
-    path = os.path.abspath("graph_generation/log.txt")
+    path = os.path.abspath("graph_generation/10to1000by10with101try.txt")
     file_object = open(path, "r")
     list1 = []
     for line in file_object:
         list2 = line.split('/')
         if list2[1] == 'Sequential':
             list1.append((int(list2[0]), int(list2[2])))
-    list3 = median(list1)
-    list4 = moyenne(list1)
-    plt.close('all')
+    list3 = moyenne(list1)
+    # plt.close('all')
     x = [i[0] for i in list3]
     y = [i[1] for i in list3]
     plt.ylabel("Time")  # y label
     plt.xlabel("Size_Instance")  # x label
     plt.grid()
     plt.plot(x, y)
-    a = [i[0] for i in list4]
-    b = [i[1] for i in list4]
-    plt.plot(a, b)
-    plt.show()
+    # plt.show()
+    plt.savefig(f'graph_generation/Graphs/{datetime.datetime.now()}.png')
 
 
 def moyenne(list_tuple):
@@ -108,10 +105,10 @@ def basic_plot(list1, title):
 
 if __name__ == '__main__':
     command = 'cargo run -- --instance-size-start 10 --instance-size-end 1000 -p 10 -t 4 -n 101'
-    subprocess.run(command, shell=True)
+    # subprocess.run(command, shell=True)
     # list_size_speedup = extract_value()
     # better_list = moyenne(list_size_speedup)
     # basic_plot(better_list, command)
-    # parallel_plot()
-    # sequential_plot()
-    subprocess.run('rm graph_generation/log.txt', shell=True)
+    parallel_plot()
+    sequential_plot()
+    # subprocess.run('rm graph_generation/log.txt', shell=True)
