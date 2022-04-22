@@ -8,11 +8,11 @@ pub(crate) struct Resultant {
 }
 
 impl Resultant {
-    pub(crate) fn new(paired_women: Vec<Woman>, algo: Algo , time_elapsed: u128) -> Resultant {
+    pub(crate) fn new(paired_women: Vec<Woman>, algo: Algo, time_elapsed: u128) -> Resultant {
         Resultant {
             paired_women,
             algo,
-            time_elapsed
+            time_elapsed,
         }
     }
 
@@ -24,5 +24,7 @@ impl Resultant {
         &self.algo
     }
 
-    pub(crate) fn time(&self) -> &u128 { &self.time}
+    pub(crate) fn time(&self) -> &u128 {
+        &self.time_elapsed
+    }
 }
