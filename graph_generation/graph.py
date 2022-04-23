@@ -104,11 +104,11 @@ def basic_plot(list1, title):
 
 
 if __name__ == '__main__':
-    command = 'cargo run -- --instance-size-start 100 --instance-size-end 500 -p 20 -t 4 -n 11'
+    command = 'cargo run -- --instance-size-start 300 --instance-size-end 700 -p 20 -t 4 -w'
     subprocess.run(command, shell=True)
     list_size_speedup = extract_value()
     better_list = median(list_size_speedup)
-    basic_plot(better_list, command)
-    # parallel_plot()
-    # sequential_plot()
+    # basic_plot(better_list, command)
+    parallel_plot()
+    sequential_plot()
     # subprocess.run('rm graph_generation/log.txt', shell=True)
