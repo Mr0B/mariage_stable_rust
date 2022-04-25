@@ -37,7 +37,6 @@ impl Algorithm for SequentialAlgorithm {
         Resultant::new(women, Sequential, time)
     }
 }
-
 impl ParallelAlgorithm {
     pub(crate) fn new(number_thread: i32) -> Self {
         ParallelAlgorithm { number_thread }
@@ -82,3 +81,4 @@ impl Algorithm for ParallelAlgorithm {
         )
     }
 }
+

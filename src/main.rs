@@ -18,7 +18,7 @@ use clap::Parser;
 use clap::*;
 use rand::prelude::SliceRandom;
 use rand::rngs::StdRng;
-use rand::SeedableRng;
+use rand::{Rng, SeedableRng};
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::convert::TryInto;
@@ -35,47 +35,59 @@ use std::time::Instant;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 pub(crate) struct Args {
-    #[clap(short, long)]
+    #[clap(short, long, default_value_t = 0)]
     seed: u64,
-    #[clap(long)]
+    #[clap(long, default_value_t = 5)]
     instance_size_start: usize,
-    #[clap(long)]
+    #[clap(long, default_value_t = 5)]
     instance_size_end: usize,
-    #[clap(short, long)]
+    #[clap(short, long, default_value_t = 1)]
     pas: usize,
-    #[clap(short, long, default_value_t = 2)]
+    #[clap(short, long, default_value_t = 4)]
     thread_number: i32,
+    #[clap(short, long, default_value_t = 1)]
+    number_repetition: u128,
     #[clap(short, long)]
-    nombre_repetition: u128,
+    worst_case: bool,
 }
 
 fn main() {
     let args = Args::parse();
-    let seed = args.seed;
+    let mut seed = args.seed;
     let size_instance_start = args.instance_size_start;
     let size_instance_end = args.instance_size_end;
     let pas = args.pas;
     let thread_number = args.thread_number;
-    let nombre_repetition = args.nombre_repetition;
-    for i in (size_instance_start..(size_instance_end + pas)).step_by(pas) {
-        for _ in 0..nombre_repetition {
-            let result_sequential = marriage_stable(Sequential, i, seed);
-            let result_parallel = marriage_stable(Parallel(thread_number), i, seed);
+    let number_repetition = args.number_repetition;
+    let worst_case = args.worst_case;
+    for i in (size_instance_start..=size_instance_end).step_by(pas) {
+        for _ in 0..number_repetition {
+            if seed == 0 {
+                let mut rng = rand::thread_rng();
+                seed = rng.gen()
+            }
+            let instance = if worst_case {
+                generate_worst_case(i)
+            } else {
+                marriage_stable(i, seed)
+            };
+            let (men2, women2) = instance.clone();
+            let result_sequential = solve(Sequential, instance.0, instance.1);
+            let result_parallel = solve(Parallel(thread_number), men2, women2);
             log_result(&result_sequential).expect("");
             log_result(&result_parallel).expect("");
+            //print_couples(result_sequential.paired_women());
+            //print_couples(result_parallel.paired_women());
         }
     }
 }
 
-fn marriage_stable(algo: Algo, size_instance: usize, seed: u64) -> Resultant {
+fn marriage_stable(size_instance: usize, seed: u64) -> (Storage<Man>, Vec<Woman>) {
     let mut random_generator = PreferenceGenerator::new(seed);
     let mut deck: Storage<Man> = Deck::new();
     init_men(&mut deck, size_instance, &mut random_generator);
     let women: Vec<Woman> = init_woman(size_instance, &mut random_generator);
-    //let mut test = deck.clone();
-    //let mut test2= women.clone();
-    //Clone les instances avant
-    solve(algo, deck, women)
+    return (deck, women);
 }
 
 fn solve(algo: Algo, men: Storage<Man>, women: Vec<Woman>) -> Resultant {
@@ -101,6 +113,19 @@ fn init_woman(number: usize, random_generator: &mut PreferenceGenerator) -> Vec<
     return women;
 }
 
+fn generate_worst_case(size: usize) -> (Storage<Man>, Vec<Woman>) {
+    let mut deck: Storage<Man> = Deck::new();
+    let pref_men: Vec<usize> = (0..size).collect();
+    (0..size)
+        .map(|i| Man::new(i, pref_men.clone(), 0))
+        .for_each(|m| deck.add(m));
+    let pref_women: Vec<usize> = (0..size).rev().collect();
+    let women: Vec<Woman> = (0..size)
+        .map(|i| Woman::new(i, pref_women.clone(), None))
+        .collect();
+    (deck, women)
+}
+
 fn init_instance(deck: Storage<Man>, women: Vec<Woman>) -> Arc<TestInstances> {
     let mut mutex_women: Vec<Mutex<Woman>> = vec![];
     for woman in women {
@@ -123,7 +148,7 @@ fn print_algo_type_and_duration(result: &Resultant) {
 
 fn log_result(result: &Resultant) -> std::io::Result<()> {
     let buffer = format!(
-        "{}/{:?}/{}/\n",
+        "{}/{:?}/{}\n",
         result.paired_women().len(),
         result.algo(),
         result.time()
