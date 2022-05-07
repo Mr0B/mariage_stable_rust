@@ -1,3 +1,4 @@
+use crate::Woman;
 use std::mem;
 use std::ops::Add;
 
@@ -18,13 +19,13 @@ impl Man {
     }
 
     /*pub(crate) fn find_next_woman(&mut self) -> Option<&usize> {
-        *self.proposing_to_mutable() = self.proposing_to() + 1;
-        if let Some(target) = self.preference().get(*self.proposing_to()) {
-            return Some(target);
+            *self.proposing_to_mutable() = self.proposing_to() + 1;
+            if let Some(target) = self.preference().get(*self.proposing_to()) {
+                return Some(target);
+            }
+            return None;
         }
-        return None;
-    }
-*/
+    */
     pub(crate) fn find_next_woman(&mut self) -> Option<&usize> {
         let mut holder = None;
         let index = self.proposing_to.clone();
@@ -32,10 +33,10 @@ impl Man {
             None => holder,
             Some(target) => {
                 holder = Option::from(target);
-                self.proposing_to=self.proposing_to.add(1);
+                self.proposing_to = self.proposing_to.add(1);
                 holder
             }
-        }
+        };
     }
 
     pub(crate) fn proposing_to(&self) -> &usize {
@@ -48,5 +49,14 @@ impl Man {
 
     fn preference(&self) -> &Vec<usize> {
         &self.preference
+    }
+
+    pub(crate) fn position_man_preference(&self, woman: &Woman) -> usize {
+        for i in 0..self.preference.len() {
+            if self.preference[i] == woman.name {
+                return i;
+            }
+        }
+        return usize::MAX;
     }
 }
