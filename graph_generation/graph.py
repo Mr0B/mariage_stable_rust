@@ -1,6 +1,6 @@
 import datetime
 import os
-# import subprocess
+import subprocess
 from collections import namedtuple
 
 import matplotlib.pyplot as plt
@@ -43,7 +43,7 @@ def parse_line(line1, line2):
 
 
 def parallel_plot():
-    path = os.path.abspath("graph_generation/10to1000by10with101try.txt")
+    path = os.path.abspath("graph_generation/100to1000by25with51tryWorstCase.txt")
     file_object = open(path, "r")
     list1 = []
     for line in file_object:
@@ -82,7 +82,7 @@ def sequential_time_100():
 
 
 def sequential_plot():
-    path = os.path.abspath("graph_generation/10to1000by10with101try.txt")
+    path = os.path.abspath("graph_generation/100to1000by25with51tryWorstCase.txt")
     file_object = open(path, "r")
     list1 = []
     for line in file_object:
@@ -98,8 +98,8 @@ def sequential_plot():
     plt.grid()
     plt.plot(x, y)
     plt.legend(["parallèle", "séquentiel"], loc="lower right")
+    plt.title("Génération Pire Cas")
     # plt.show()
-    plt.title("Temps d'exécution/Taille de l'instance 10-1000 pas=10")
     plt.savefig(f'graph_generation/Graphs/{datetime.datetime.now()}.png')
 
 
@@ -145,8 +145,7 @@ def basic_plot(list1):
     plt.ylabel("Speed_Up")  # y label
     plt.xlabel("Size_Instance")  # x label
     plt.grid()
-    plt.plot(x,y)
-    plt.title("Speed_up/Taille Instance 10-1000 pas=25/Worst-Case")
+    plt.plot(x, y)
     plt.savefig(f'graph_generation/Graphs/{datetime.datetime.now()}.png')
 
 
@@ -165,21 +164,20 @@ def threads_iterations_plots(list1, list2, list3):
     plt.plot(c, d)
     plt.plot(e, f)
     plt.legend(["2 thread", "3 thread", "4 thread"], loc="lower right")
-    plt.title("Speed_up/Taille Instance 100-200(pas=10)/nombre_threads")
     plt.savefig(f'graph_generation/Graphs/{datetime.datetime.now()}.png')
 
 
 if __name__ == '__main__':
-    command = 'cargo run -- --instance-size-start 100 --instance-size-end 1000 -p 25 -t 4 -n 51 -w'
+    command = 'cargo run -- --instance-size-start 100 --instance-size-end 1000 -p 25 -t 4 -n 51'
     # subprocess.run(command, shell=True)
-    # list_speedup_2 = moyenne(extract_value("graph_generation/seed42threads2.txt"))
-    # list_speedup_3 = moyenne(extract_value("graph_generation/seed42threads3.txt"))
-    # list_speedup_4 = moyenne(extract_value("graph_generation/seed42threads4.txt"))
+    # list_speedup_2 = moyenne(extract_value_1("graph_generation/seed42threads2start100to600.txt"))
+    # list_speedup_3 = moyenne(extract_value_1("graph_generation/seed42threads3start100to600.txt"))
+    # list_speedup_4 = moyenne(extract_value_1("graph_generation/seed42threads4start100to600.txt"))
     # threads_iterations_plots(list_speedup_2, list_speedup_3, list_speedup_4)
-    list_size_speedup = extract_value_1("graph_generation/100to1000by25with51tryWorstCase.txt")
-    better_list = moyenne(list_size_speedup)
-    basic_plot(better_list)
-    # parallel_plot()
-    # sequential_plot()
+    # list_size_speedup = extract_value_1("graph_generation/big_server_database.txt")
+    # better_list = median(list_size_speedup)
+    # basic_plot(better_list)
+    parallel_plot()
+    sequential_plot()
     # subprocess.run('rm graph_generation/log.txt', shell=True)
     # print(sequential_time_100())

@@ -74,10 +74,17 @@ fn main() {
             let (men2, women2) = instance.clone();
             let result_sequential = solve(Sequential, instance.0, instance.1);
             let result_parallel = solve(Parallel(thread_number), men2, women2);
-            log_result(&result_sequential).expect("");
-            log_result(&result_parallel).expect("");
-            //print_couples(result_sequential.paired_women());
-            //print_couples(result_parallel.paired_women());
+            if check_stability(&result_sequential.paired_women())
+                && check_result(
+                    &result_sequential.paired_women(),
+                    &result_parallel.paired_women(),
+                )
+            {
+                //log_result(&result_sequential).expect("");
+                //log_result(&result_parallel).expect("");
+                print_couples(result_sequential.paired_women());
+                print_couples(result_parallel.paired_women());
+            }
         }
     }
 }
@@ -192,6 +199,26 @@ fn print_couples(women: &Vec<Woman>) {
             }
         }
     }
+}
+
+fn check_stability(women: &Vec<Woman>) -> bool {
+    for woman1 in women {
+        if let Some(man1) = woman1.favorite() {
+            let position1 = woman1.position_woman_preference(man1);
+            for woman2 in women {
+                if let Some(man2) = woman2.favorite() {
+                    let position2 = woman1.position_woman_preference(man2);
+                    if (position1 > position2)
+                        && (man2.position_man_preference(woman2)
+                            > man2.position_man_preference(woman1))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
 }
 
 fn check_result(women_sequential: &Vec<Woman>, women_parallel: &Vec<Woman>) -> bool {

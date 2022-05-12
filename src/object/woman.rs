@@ -46,4 +46,13 @@ impl Woman {
         self.preference.iter().position(|&r| r == man1.name)
             < self.preference.iter().position(|&r| r == man2.name)
     }
+
+    pub(crate) fn position_woman_preference(&self, man: &Man) -> usize {
+        for i in 0..self.preference.len() {
+            if self.preference[i] == man.name {
+                return i;
+            }
+        }
+        return usize::MAX;
+    }
 }
