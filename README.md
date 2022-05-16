@@ -9,4 +9,8 @@ Il se divise en deux partie, un solveur du problème des mariages stables (en Ru
 ### La génération de graphique:
   - [Python (Latest)](https://www.python.org/downloads/ "Python's Download")
   - [Pip](https://pip.pypa.io/en/stable/installation/ "Pip's Installation")
+  - [Numpy](https://numpy.org/install/ "Numpy's Installation")
+  - [Matplotlib](https://matplotlib.org/stable/users/getting_started/index.html#installation-quick-start/ "Matplotlib's Installation")
 
+## Comment lancer:
+  - 
